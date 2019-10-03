@@ -138,14 +138,28 @@ public class Game {
 
     public void drawFirstStapelCard() {
         final Card firstStapelCard = drawCardFromDeck();
+        System.out.println(firstStapelCard);
+        switch(firstStapelCard.getValue()){
+            case 7:
+                System.out.println("Recognized as 7");
+                increaseSevenMultiplier();
+                break;
 
-        if(firstStapelCard.getValue() == 7){
-            increaseSevenMultiplier();
-        } else if (firstStapelCard.getValue() == 8){
-            playerTurn = calculateNextPlayer();
-        } else if(firstStapelCard.getValue() == Card.JACK){
-            firstCardIsJack = true;
+            case 8:
+                System.out.println("Recognized as 8");
+                playerTurn = calculateNextPlayer();
+                break;
+
+            case Card.JACK:
+                System.out.println("Recognized as Jack");
+                firstCardIsJack = true;
+                break;
+
+            default:
+                System.out.println("Recognized as other");
+                break;
         }
+
         putCardOnStapel(firstStapelCard);
     }
 
@@ -174,33 +188,41 @@ public class Game {
      * @param card Card to lay on top of the stapel
      */
     public void requestPutCardOnStapel(Card card) {
-        final Card topStapelCard = getTopStapelCard();
-        boolean validCard = true;
-        if(firstCardIsJack){
+        boolean validMove = isValidMove(card);
+        if (validMove) {
             putCardOnStapel(card);
+        } else {
+            printGameInformation();
+            throw new RuntimeException("Card " + card + " can't be layed on " + getTopStapelCard());
+        }
+    }
+
+    public boolean isValidMove(Card card) {
+        final Card topStapelCard = getTopStapelCard();
+        boolean validCard;
+        if(firstCardIsJack){
+            validCard = true;
             firstCardIsJack = false;
         } else {
             //TODO: If 7 is on top, only 7 allowed
             if (topStapelCard.getValue() == Card.JACK) {
                 if (card.getColor() == wishedColor) {
-                    putCardOnStapel(card);
+                    validCard = true;
                 } else {
                     validCard = false;
                 }
             } else if (card.canBeLayedOn(topStapelCard)) {
-                putCardOnStapel(card);
+                validCard = true;
             } else {
                 validCard = false;
             }
-            if (!validCard) {
-                printGameInformation();
-                throw new RuntimeException("Card " + card + " can't be layed on " + topStapelCard);
-            }
         }
+        return validCard;
     }
 
     private void printGameInformation(){
         StringBuilder sb = new StringBuilder();
+        sb.append("firstCardIsJack: "+firstCardIsJack);
         getPlayers().forEach(player -> {
             String currentPlayerDisplay = "";
             if(playerTurn == player.getPlayerId()){

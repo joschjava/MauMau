@@ -94,7 +94,7 @@ public class Controller {
         List<Card> cards = deck.subList(0, shownCards);
         hbDeck.getChildren().clear();
         for (int i = 0; i < cards.size(); i++) {
-            Text cardText = createColoredText(cards.get(i), i);
+            Text cardText = createColoredText(cards.get(i), i, true);
             hbDeck.getChildren().add(cardText);
         }
 
@@ -108,16 +108,19 @@ public class Controller {
             if (!player.isPlayerFinished()) {
                 for (int i = 0; i < handCards.size(); i++) {
                     Card card = handCards.get(i);
-                    Text cardText = createColoredText(card, i);
+                    boolean validMove = true;
                     if (plId == currentPlayerId) {
+                        String colorString = "#9281ED";
                         tFlPlayer.setBackground(
                                 new Background(
                                         new BackgroundFill(
-                                                Color.web("#9281ED"),
+                                                Color.web(colorString),
                                                 CornerRadii.EMPTY,
                                                 Insets.EMPTY)
                                 ));
+                        validMove = game.isValidMove(card);
                     }
+                    Text cardText = createColoredText(card, i, validMove);
                     tFlPlayer.getChildren().add(cardText);
                 }
             } else {
@@ -136,10 +139,14 @@ public class Controller {
         lbStapel.setText(stapelCard.toPrettyString());
     }
 
-    private Text createColoredText(Card card, int i) {
+    private Text createColoredText(Card card, int i, boolean validMove) {
         Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
-        if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
-            cardText.setFill(Color.ORANGE);
+        if(validMove){
+            if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
+                cardText.setFill(Color.ORANGE);
+            }
+        } else {
+            cardText.setFill(Color.GRAY);
         }
         return cardText;
     }

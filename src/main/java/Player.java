@@ -11,10 +11,25 @@ public class Player {
     private Game game;
     private int playerId;
     private int place = -1;
+    private AI ai;
+
 
     public Player(Game game, int playerId) {
+        this(game, playerId, null);
+    }
+
+    public Player(Game game, int playerId, AI ai){
         this.playerId = playerId;
         this.game = game;
+        this.ai = ai;
+    }
+
+    public boolean isAi(){
+        if(ai == null){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public void addCardsToHand(List<Card> cards) {

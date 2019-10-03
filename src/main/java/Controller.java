@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Controller {
@@ -70,7 +71,11 @@ public class Controller {
         setJackChooserButtonListener(btKreuz, Card.COLOR.KREUZ);
 
         game = new Game(3);
-        game.initGame();
+        List<AI> ais = new ArrayList<>();
+        ais.add(null);
+        ais.add(new RandomAI(game));
+        ais.add(new RandomAI(game));
+        game.initGame(ais);
         hbJackPickerBox.setVisible(false);
         updateGui();
     }

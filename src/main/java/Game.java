@@ -8,10 +8,14 @@ public class Game {
     private List<Card> deck = new ArrayList<>();
     private List<Card> stapel = new ArrayList<>();
     private int numPlayers;
-    /** If 7 is put on top of other 7s cards to draw increase */
+    /**
+     * If 7 is put on top of other 7s cards to draw increase
+     */
     public int sevenMultiplier = 0;
 
-    /** If eight that is on top of stapel was already skipped */
+    /**
+     * If eight that is on top of stapel was already skipped
+     */
     private boolean eightIsPaid = false;
 
     private int CARDS_PER_PLAYER = 6;
@@ -83,11 +87,19 @@ public class Game {
     }
 
     void initGame() {
+        initGame(null);
+    }
+
+    void initGame(List<AI> ais) {
         stapel.clear();
         deck.clear();
         generateAllCards();
         shuffleDeck();
-        generatePlayers();
+        if (ais == null) {
+            generatePlayers();
+        } else {
+            generatePlayers(ais);
+        }
         drawFirstStapelCard();
     }
 
@@ -110,17 +122,27 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
-        if(!hasPlayerPlayableCards()){
-            System.out.println("Skipped player "+getCurrentPlayerId());
-            getCurrentPlayer().pass();
+        Player currentPlayer = getCurrentPlayer();
+        if (!hasPlayerPlayableCards()) {
+            System.out.println("Skipped player " + getCurrentPlayerId());
+            currentPlayer.pass();
+        }
+        if(currentPlayer.isAi()){
+           AI ai = currentPlayer.getAi();
+           Card card = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
+           if(card != null){
+           boolean isJack = currentPlayer.playCard(card);
+           } else {
+               currentPlayer.pass();
+           }
         }
     }
 
-    private boolean hasPlayerPlayableCards(){
+    private boolean hasPlayerPlayableCards() {
         List<Card> handCards = getCurrentPlayer().getHandCards();
         boolean hasValidCards = false;
-        for(int i=0;i< handCards.size();i++){
-            if(isValidMove(handCards.get(i))){
+        for (int i = 0; i < handCards.size(); i++) {
+            if (isValidMove(handCards.get(i))) {
                 hasValidCards = true;
                 break;
             }
@@ -199,6 +221,7 @@ public class Game {
 
     /**
      * Adds card to top of the stapel
+     *
      * @param card Card to lay on top of the stapel
      */
     public void requestPutCardOnStapel(Card card) {
@@ -226,7 +249,7 @@ public class Game {
                     validCard = false;
                 }
             } else if (topStapelCard.getValue() == 7 && sevenMultiplier != 0) {
-                if(card.getValue() == 7){
+                if (card.getValue() == 7) {
                     validCard = true;
                 } else {
                     validCard = false;
@@ -263,7 +286,7 @@ public class Game {
     }
 
     public void putCardOnStapel(Card card) {
-        if(card.getValue() == 8){
+        if (card.getValue() == 8) {
             // Set that 8 penalty will be given for next player
             eightIsPaid = false;
         }
@@ -291,12 +314,22 @@ public class Game {
         return drawnCards;
     }
 
-    private void generatePlayers() {
+    private void generatePlayers(){
+        generatePlayers(null);
+    }
+
+    private void generatePlayers(List<AI> ais) {
+        if(ais != null) {
+            if (ais.size() != numPlayers) {
+                throw new RuntimeException("AI length is not the same as possible players");
+            }
+        }
+
         if (numPlayers * CARDS_PER_PLAYER > deck.size()) {
             throw new RuntimeException("Not enough cards (" + deck.size() + ") for " + numPlayers + " Players");
         }
         for (int i = 0; i < numPlayers; i++) {
-            Player player = new Player(this, i);
+            Player player = new Player(this, i, ais.get(i));
             List<Card> playerCards = drawCardsFromDeck(CARDS_PER_PLAYER);
             player.addCardsToHand(playerCards);
             players.add(player);

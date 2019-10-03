@@ -34,7 +34,7 @@ public class UnitTest {
         game.initGame();
         for(int i=0;i<4;i++){
             Card card = game.drawCardFromDeck();
-            game.requestPutCardOnStapel(card, true);
+            game.putCardOnStapel(card);
         }
     }
 
@@ -48,15 +48,15 @@ public class UnitTest {
         final Game game = new Game(3);
         game.initGame();
         game.setNextPlayer();
-        assertEquals(1, game.getCurrentPlayer());
+        assertEquals(1, game.getCurrentPlayerId());
         Card pik8 = new Card(Card.COLOR.PIK, 8);
-        game.requestPutCardOnStapel(pik8, true);
+        game.putCardOnStapel(pik8);
         game.setNextPlayer();
-        assertEquals(0, game.getCurrentPlayer());
+        assertEquals(0, game.getCurrentPlayerId());
     }
 
     @Test
-    public void jackTest1(){
+    public void jackOnStapelNextCardIsAsWished(){
         Game game = new Game(3);
         prepareJackTest(game);
         Card card = new Card(Card.COLOR.KREUZ, 9);
@@ -64,7 +64,7 @@ public class UnitTest {
     }
 
     @Test (expected = RuntimeException.class)
-    public void jackTest2(){
+    public void jackOnStapelNextCardIsNotAsWished(){
         Game game = new Game(3);
         prepareJackTest(game);
         Card card = new Card(Card.COLOR.PIK, 9);
@@ -74,7 +74,7 @@ public class UnitTest {
     private void prepareJackTest(Game game) {
         game.initGame();
         Card card = new Card(Card.COLOR.PIK, Card.JACK);
-        game.requestPutCardOnStapel(card, true);
+        game.putCardOnStapel(card);
         game.setWishedColor(Card.COLOR.KREUZ);
     }
 

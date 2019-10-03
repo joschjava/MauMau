@@ -12,10 +12,10 @@ public class Card {
     }
 
     public enum COLOR { PIK, CARO, HERZ, KREUZ }
-    public static int JACK = 11;
-    public static int QUEEN = 12;
-    public static int KING = 13;
-    public static int ACE = 14;
+    public final static int JACK = 11;
+    public final static int QUEEN = 12;
+    public final static int KING = 13;
+    public final static int ACE = 14;
 
     private COLOR color;
     private int value;
@@ -36,5 +36,46 @@ public class Card {
      */
     public void compare(Card card){
         System.out.println("Not implemented yet: Compare");
+    }
+
+    public String toPrettyString(){
+        String output = "";
+        switch(color){
+            case PIK:
+                output += "\u2660";
+                break;
+            case CARO:
+                output += "\u2666";
+                break;
+            case HERZ:
+                output += "\u2665";
+                break;
+            case KREUZ:
+                output += "\u2663";
+                break;
+        }
+
+        if(value < 11){
+            output += String.valueOf(value);
+        } else {
+            switch(value){
+                case JACK:
+                    output += "J";
+                    break;
+
+                case QUEEN:
+                    output += "Q";
+                    break;
+
+                case KING:
+                    output += "K";
+                    break;
+
+                case ACE:
+                    output += "A";
+                    break;
+            }
+        }
+        return output;
     }
 }

@@ -1,12 +1,19 @@
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class Player {
 
     private List<Card> handCards = new ArrayList<>();
     private Game game;
+    private int playerId;
+    //TODO: place
+    private int place = -1;
 
-    public Player(Game game) {
+    public Player(Game game, int playerId) {
+        this.playerId = playerId;
         this.game = game;
     }
 

@@ -1,13 +1,19 @@
+import lombok.Data;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
 public class Game {
 
     private List<Card> deck = new ArrayList<>();
     private List<Card> stapel = new ArrayList<>();
     private int numPlayers;
+
     private int CARDS_PER_PLAYER = 6;
+    public List<Player> players = new ArrayList<>();
     private int playerTurn = 0;
     private Card.COLOR wishedColor = null;
 
@@ -24,6 +30,10 @@ public class Game {
         drawFirstStapelCard();
         System.out.println("Deck: ");
         deck.forEach(System.out::println);
+    }
+
+    public Player getCurrentPlayer(){
+        return players.get(playerTurn);
     }
 
     public void setWishedColor(Card.COLOR color){
@@ -51,7 +61,7 @@ public class Game {
         }
     }
 
-    public int getCurrentPlayer() {
+    public int getCurrentPlayerId() {
         return playerTurn;
     }
 
@@ -62,7 +72,7 @@ public class Game {
     private void drawFirstStapelCard() {
         final Card firstStapelCard = drawCardFromDeck();
         //TODO: Wish when Jack
-        requestPutCardOnStapel(firstStapelCard);
+        putCardOnStapel(firstStapelCard);
     }
 
     private void shuffleDeck() {
@@ -82,27 +92,31 @@ public class Game {
         }
     }
 
-    public void requestPutCardOnStapel(Card card) {
-        requestPutCardOnStapel(card, false);
-    }
-
+    //TODO: Later refactor this function so it returns if card is valid to put on or not
     /**
      * Adds card to top of the stapel
      * @param card Card to lay on top of the stapel
-     * @param force if true, skip checking if move is valid
      */
-    public void requestPutCardOnStapel(Card card, boolean force) {
+    public void requestPutCardOnStapel(Card card) {
         final Card topStapelCard = getTopStapelCard();
-        if(topStapelCard.getValue() == Card.JACK && card.getColor() == wishedColor){
-            putCardOnStapel(card);
-        } else if (card.canBeLayedOn(topStapelCard) || force) {
+        boolean validCard = true;
+        if(topStapelCard.getValue() == Card.JACK){
+            if(card.getColor() == wishedColor) {
+                putCardOnStapel(card);
+            } else {
+                validCard = false;
+            }
+        } else if (card.canBeLayedOn(topStapelCard)) {
             putCardOnStapel(card);
         } else {
+            validCard = false;
+        }
+        if(!validCard){
             throw new RuntimeException("Card " + card + " can't be layed on " + topStapelCard);
         }
     }
 
-    private void putCardOnStapel(Card card) {
+    public void putCardOnStapel(Card card) {
         stapel.add(card);
         wishedColor = null;
     }
@@ -131,9 +145,10 @@ public class Game {
             throw new RuntimeException("Not enough cards (" + deck.size() + ") for " + numPlayers + " Players");
         }
         for (int i = 0; i < numPlayers; i++) {
-            Player player = new Player(this);
+            Player player = new Player(this, i);
             List<Card> playerCards = drawCardsFromDeck(CARDS_PER_PLAYER);
             player.addCardsToHand(playerCards);
+            players.add(player);
             System.out.println("Player1: \n" + player);
         }
     }

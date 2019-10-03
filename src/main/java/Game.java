@@ -8,9 +8,11 @@ public class Game {
     private List<Card> deck = new ArrayList<>();
     private List<Card> stapel = new ArrayList<>();
     private int numPlayers;
-    // If 7 is put on top of other 7s cards to draw increase
+    /** If 7 is put on top of other 7s cards to draw increase */
     public int sevenMultiplier = 0;
 
+    /** If eight that is on top of stapel was already skipped */
+    private boolean eightIsPaid = false;
 
     private int CARDS_PER_PLAYER = 6;
     public List<Player> players = new ArrayList<>();
@@ -44,7 +46,7 @@ public class Game {
         return leftPlayers;
     }
 
-    public List<Card> getDeck(){
+    public List<Card> getDeck() {
         return deck;
     }
 
@@ -106,7 +108,8 @@ public class Game {
         if (topStapelCard == null) {
             throw new RuntimeException("Stapel is null but shouldn't be");
         }
-        if (topStapelCard.getValue() == 8) {
+        if (topStapelCard.getValue() == 8 && !eightIsPaid) {
+            eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
     }
@@ -139,7 +142,7 @@ public class Game {
     public void drawFirstStapelCard() {
         final Card firstStapelCard = drawCardFromDeck();
         System.out.println(firstStapelCard);
-        switch(firstStapelCard.getValue()){
+        switch (firstStapelCard.getValue()) {
             case 7:
                 System.out.println("Recognized as 7");
                 increaseSevenMultiplier();
@@ -180,11 +183,8 @@ public class Game {
         }
     }
 
-    //TODO: Later refactor this function so it returns if card is valid to put on or not
-
     /**
      * Adds card to top of the stapel
-     *
      * @param card Card to lay on top of the stapel
      */
     public void requestPutCardOnStapel(Card card) {
@@ -200,13 +200,19 @@ public class Game {
     public boolean isValidMove(Card card) {
         final Card topStapelCard = getTopStapelCard();
         boolean validCard;
-        if(firstCardIsJack){
+        if (firstCardIsJack) {
             validCard = true;
             firstCardIsJack = false;
         } else {
-            //TODO: If 7 is on top, only 7 allowed
+
             if (topStapelCard.getValue() == Card.JACK) {
                 if (card.getColor() == wishedColor) {
+                    validCard = true;
+                } else {
+                    validCard = false;
+                }
+            } else if (topStapelCard.getValue() == 7 && sevenMultiplier != 0) {
+                if(card.getValue() == 7){
                     validCard = true;
                 } else {
                     validCard = false;
@@ -220,15 +226,15 @@ public class Game {
         return validCard;
     }
 
-    private void printGameInformation(){
+    private void printGameInformation() {
         StringBuilder sb = new StringBuilder();
-        sb.append("firstCardIsJack: "+firstCardIsJack);
+        sb.append("firstCardIsJack: " + firstCardIsJack);
         getPlayers().forEach(player -> {
             String currentPlayerDisplay = "";
-            if(playerTurn == player.getPlayerId()){
+            if (playerTurn == player.getPlayerId()) {
                 currentPlayerDisplay = "(current)";
             }
-            sb.append("Player " + player.getPlayerId() +" "+ currentPlayerDisplay + "\n");
+            sb.append("Player " + player.getPlayerId() + " " + currentPlayerDisplay + "\n");
             sb.append("Handcards:" + player.getHandCards() + "\n");
             sb.append("Place: " + player.getPlace() + "\n");
             sb.append("\n");
@@ -243,6 +249,10 @@ public class Game {
     }
 
     public void putCardOnStapel(Card card) {
+        if(card.getValue() == 8){
+            // Set that 8 penalty will be given for next player
+            eightIsPaid = false;
+        }
         stapel.add(card);
         wishedColor = null;
     }

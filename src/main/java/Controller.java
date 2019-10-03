@@ -137,6 +137,7 @@ public class Controller {
             lbStapel.setTextFill(Color.BLACK);
         }
         lbStapel.setText(stapelCard.toPrettyString());
+        tfInput.requestFocus();
     }
 
     private Text createColoredText(Card card, int i, boolean validMove) {
@@ -154,7 +155,6 @@ public class Controller {
     public void submitAction() {
         String text = tfInput.getText();
         tfInput.setText("");
-        tfInput.requestFocus();
         int cardId = Integer.valueOf(text);
         Player currentPlayer = game.getCurrentPlayer();
         boolean jackLaid = currentPlayer.playCardId(cardId);

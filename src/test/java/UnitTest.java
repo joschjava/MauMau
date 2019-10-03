@@ -6,6 +6,8 @@ import static org.junit.Assert.*;
 
 public class UnitTest {
 
+
+
     @Test(expected = RuntimeException.class)
     public void invalidValueTest() {
         new Card(Card.COLOR.CARO, 3);
@@ -172,18 +174,41 @@ public class UnitTest {
     }
 
     @Test
-    public void playerFinishedTest() {
-        Game game = new Game(3);
-        game.initGame();
+    public void playerPassedBecauseHeHasNoOptionsTest() {
+        Game game = createGameWithNoPlayerHavingCards();
+        Card pik10 = new Card(Card.COLOR.PIK, 10);
+        game.putCardOnStapel(pik10);
         List<Player> players = game.getPlayers();
-
         Player player0 = players.get(0);
         Player player1 = players.get(1);
         Player player2 = players.get(2);
 
-        player0.getHandCards().clear();
-        player1.getHandCards().clear();
-        player2.getHandCards().clear();
+        Card pik9 = new Card(Card.COLOR.PIK, 9);
+        Card kreuz9 = new Card(Card.COLOR.KREUZ, 9);
+        Card herz10 = new Card(Card.COLOR.HERZ, 10);
+        Card pikAce = new Card(Card.COLOR.PIK, Card.ACE);
+
+        //Hands
+        player0.addCardToHand(pik9);
+        player0.addCardToHand(kreuz9);
+        player1.addCardToHand(herz10);
+        player2.addCardToHand(pikAce);
+
+        player0.playCard(pik9);
+
+        assertEquals(2, game.getCurrentPlayerId());
+
+    }
+
+
+
+    @Test
+    public void playerFinishedTest() {
+        Game game = createGameWithNoPlayerHavingCards();
+        List<Player> players = game.getPlayers();
+        Player player0 = players.get(0);
+        Player player1 = players.get(1);
+        Player player2 = players.get(2);
 
         Card herz9 = new Card(Card.COLOR.HERZ, 9);
         Card herz10 = new Card(Card.COLOR.HERZ, 10);
@@ -208,6 +233,20 @@ public class UnitTest {
         player2.playCard(herzQueen);
         assertEquals(2, player2.getPlace());
         assertEquals(3, player0.getPlace());
+    }
+
+    private Game createGameWithNoPlayerHavingCards(){
+        Game game = new Game(3);
+        game.initGame();
+        List<Player> players = game.getPlayers();
+        Player player0 = players.get(0);
+        Player player1 = players.get(1);
+        Player player2 = players.get(2);
+
+        player0.getHandCards().clear();
+        player1.getHandCards().clear();
+        player2.getHandCards().clear();
+        return game;
     }
 
     @Test

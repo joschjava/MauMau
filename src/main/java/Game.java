@@ -22,7 +22,6 @@ public class Game {
     // If the first card on stapel is jack at game beginning
     private boolean firstCardIsJack = false;
 
-
     private Card.COLOR wishedColor = null;
 
     Game(int numPlayers) {
@@ -103,7 +102,6 @@ public class Game {
 
     public void setNextPlayer() {
         playerTurn = calculateNextPlayer();
-
         final Card topStapelCard = getTopStapelCard();
         if (topStapelCard == null) {
             throw new RuntimeException("Stapel is null but shouldn't be");
@@ -112,6 +110,22 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
+        if(!hasPlayerPlayableCards()){
+            System.out.println("Skipped player "+getCurrentPlayerId());
+            getCurrentPlayer().pass();
+        }
+    }
+
+    private boolean hasPlayerPlayableCards(){
+        List<Card> handCards = getCurrentPlayer().getHandCards();
+        boolean hasValidCards = false;
+        for(int i=0;i< handCards.size();i++){
+            if(isValidMove(handCards.get(i))){
+                hasValidCards = true;
+                break;
+            }
+        }
+        return hasValidCards;
     }
 
     public Card getTopStapelCard() {

@@ -1,6 +1,7 @@
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -19,10 +20,12 @@ public class Player {
 
     public void addCardsToHand(List<Card> cards){
         handCards.addAll(cards);
+        Collections.sort(handCards);
     }
 
     public void addCardToHand(Card card){
         handCards.add(card);
+        Collections.sort(handCards);
     }
 
     public void playCardId(int i){

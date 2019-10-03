@@ -3,10 +3,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -14,7 +11,6 @@ import javafx.scene.text.TextFlow;
 import java.util.List;
 
 public class Controller {
-
 
     @FXML
     Button btSubmit;
@@ -31,8 +27,22 @@ public class Controller {
     @FXML
     Button btPass;
 
-    Game game;
+    @FXML
+    Button btPik;
 
+    @FXML
+    Button btHerz;
+
+    @FXML
+    Button btCaro;
+
+    @FXML
+    Button btKreuz;
+
+    @FXML
+    HBox hbJackPickerBox;
+
+    Game game;
 
     @FXML
     public void initialize() {
@@ -44,9 +54,24 @@ public class Controller {
             passAction();
             updateGui();
         });
+        setJackChooserButtonListener(btPik, Card.COLOR.PIK);
+        setJackChooserButtonListener(btHerz, Card.COLOR.HERZ);
+        setJackChooserButtonListener(btCaro, Card.COLOR.CARO);
+        setJackChooserButtonListener(btKreuz, Card.COLOR.KREUZ);
+
         game = new Game(3);
         game.initGame();
+        Card card = new Card(Card.COLOR.HERZ, Card.JACK);
+        game.getPlayers().get(0).addCardToHand(card);
+        hbJackPickerBox.setVisible(false);
         updateGui();
+    }
+
+    public void setJackChooserButtonListener(Button button, Card.COLOR color){
+        button.setOnAction(event -> {
+            wishColor(color);
+            updateGui();
+        });
     }
 
     public void updateGui() {
@@ -94,7 +119,15 @@ public class Controller {
         tfInput.requestFocus();
         int cardId = Integer.valueOf(text);
         Player currentPlayer = game.getCurrentPlayer();
-        currentPlayer.playCardId(cardId);
+        boolean jackLaid = currentPlayer.playCardId(cardId);
+        if (jackLaid) {
+            hbJackPickerBox.setVisible(true);
+        }
+    }
+
+    public void wishColor(Card.COLOR color) {
+        game.setWishedColor(color);
+        hbJackPickerBox.setVisible(false);
     }
 
     public void passAction() {

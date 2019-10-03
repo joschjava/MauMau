@@ -53,6 +53,7 @@ public class Game {
 
     public void setWishedColor(Card.COLOR color){
         wishedColor = color;
+        setNextPlayer();
     }
 
     public void setNextPlayer() {

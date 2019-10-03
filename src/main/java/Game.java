@@ -112,6 +112,7 @@ public class Game {
     }
 
     public void setNextPlayer() {
+        System.out.println("Going to next player from "+getCurrentPlayerId());
         playerTurn = calculateNextPlayer();
         final Card topStapelCard = getTopStapelCard();
         if (topStapelCard == null) {
@@ -121,16 +122,17 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
-        Player currentPlayer = getCurrentPlayer();
         if (!hasPlayerPlayableCards()) {
-            System.out.println("Skipped player " + getCurrentPlayerId());
-            currentPlayer.pass();
+            if(getCurrentPlayerId() == 0) {
+                System.out.println("Skipped player " + getCurrentPlayerId());
+                getCurrentPlayer().pass();
+            }
         }
+        Player currentPlayer = getCurrentPlayer();
         if (currentPlayer.isAi()) {
             AI ai = currentPlayer.getAi();
-            Card card = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
-            if (card != null) {
-                CardAction cardAction = new CardAction(card);
+            CardAction cardAction = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
+            if (cardAction.getCard() != null) {
                 currentPlayer.playCard(cardAction);
             } else {
                 currentPlayer.pass();
@@ -230,7 +232,7 @@ public class Game {
             putCardOnStapel(card);
         } else {
             printGameInformation();
-            throw new RuntimeException("Card " + card + " can't be layed on " + getTopStapelCard());
+            throw new RuntimeException("Card " + card + " can't be layed on '" + getTopStapelCard()+ "'");
         }
     }
 
@@ -239,6 +241,7 @@ public class Game {
         boolean validCard;
         if (firstCardIsJack) {
             validCard = true;
+            //TODO: THIS MIGHT THE PROBLEM FOR ISSUE 1, this resets everything, event though only cards are being checked
             firstCardIsJack = false;
         } else {
             if (topStapelCard.getValue() == Card.JACK) {
@@ -342,8 +345,8 @@ public class Game {
             List<Card> playerCards = drawCardsFromDeck(CARDS_PER_PLAYER);
             player.addCardsToHand(playerCards);
             players.add(player);
-            Card jackCard = new Card(Card.COLOR.KREUZ, Card.JACK);
-            player.addCardToHand(jackCard);
+//            Card jackCard = new Card(Card.COLOR.KREUZ, Card.JACK);
+//            player.addCardToHand(jackCard);
         }
     }
 

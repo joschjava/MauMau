@@ -77,7 +77,7 @@ public class Controller {
         ais.add(null);
         ais.add(new RandomAI(game));
         ais.add(new RandomAI(game));
-        game.initGame();
+        game.initGame(ais);
         hbJackPickerBox.setVisible(false);
         updateGui();
     }

@@ -1,6 +1,5 @@
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class RandomAI extends AI {
 
@@ -9,13 +8,8 @@ public class RandomAI extends AI {
     }
 
     @Override
-    Card makeMove(List<Card> handCards, Card stapelCard) {
-        List<Card> possiblePlayableCards = super.getPossiblePlayableCards(handCards)
-                .stream()
-                .filter(
-                        card -> card.getValue() != Card.JACK
-                )
-                .collect(Collectors.toList());
+    CardAction makeMove(List<Card> handCards, Card stapelCard) {
+        List<Card> possiblePlayableCards = super.getPossiblePlayableCards(handCards);
 
         int size = possiblePlayableCards.size();
         if (size == 0) {
@@ -25,8 +19,36 @@ public class RandomAI extends AI {
         }
         int playCardId = getRandomNumberInRange(size - 1);
         Card card = possiblePlayableCards.get(playCardId);
-        System.out.println("I'm playing " + card.toString());
-        return card;
+        CardAction cardAction = new CardAction(card);
+        if(card.getValue() == Card.JACK){
+            Card.COLOR randomColor = getRandomColor();
+            cardAction.setJackWishColor(randomColor);
+        }
+//        System.out.println("Player "+game.getCurrentPlayerId() + ": I'm playing " + card.toString());
+        return cardAction;
+    }
+
+    private static Card.COLOR getRandomColor() {
+        int randomInt = getRandomNumberInRange(3);
+        Card.COLOR color = Card.COLOR.PIK;
+        switch (randomInt) {
+            case 0:
+                color = Card.COLOR.PIK;
+                break;
+
+            case 1:
+                color = Card.COLOR.HERZ;
+                break;
+
+            case 2:
+                color = Card.COLOR.KREUZ;
+                break;
+
+            case 3:
+                color = Card.COLOR.CARO;
+                break;
+        }
+        return color;
     }
 
     public static int getRandomNumberInRange(int max) {

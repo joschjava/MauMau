@@ -19,5 +19,5 @@ abstract class AI {
         return possibleCards;
     }
 
-    abstract Card makeMove(List<Card> handCards, Card stapelCard);
+    abstract CardAction makeMove(List<Card> handCards, Card stapelCard);
 }

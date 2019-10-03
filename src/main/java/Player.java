@@ -61,6 +61,7 @@ public class Player {
             game.setWishedColor(wishedColor);
             System.out.println("Setting wished color: " + wishedColor);
         }
+        System.out.println("Player "+playerId + " plays "+card);
         game.requestPutCardOnStapel(card);
         handCards.remove(card);
         boolean gameFinished = false;

@@ -65,15 +65,6 @@ public class Card implements Comparable<Card> {
         return true;
     }
 
-    //TODO: compare
-
-    /**
-     * @deprecated Not yet implemented
-     */
-    public void compare(Card card) {
-        System.out.println("Not implemented yet: Compare");
-    }
-
     public String toPrettyString() {
         String output = "";
         switch (color) {

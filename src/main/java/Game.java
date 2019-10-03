@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Game {
 
@@ -8,32 +10,67 @@ public class Game {
     private List<Card> stapel = new ArrayList<>();
     private int numPlayers;
     // If 7 is put on top of other 7s cards to draw increase
-    public int sevenMultiplyer = 0;
+    public int sevenMultiplier = 0;
 
 
     private int CARDS_PER_PLAYER = 6;
     public List<Player> players = new ArrayList<>();
     private int playerTurn = 0;
+    private int leftPlayers;
+
     private Card.COLOR wishedColor = null;
 
     Game(int numPlayers) {
         this.numPlayers = numPlayers;
+        this.leftPlayers = numPlayers;
     }
 
-    public int getSevenMultiplyer(){
-        return sevenMultiplyer;
+    public int getSevenMultiplier() {
+        return sevenMultiplier;
     }
 
-    public void increaseSevenMultiplier(){
-        sevenMultiplyer++;
+    public void increaseSevenMultiplier() {
+        sevenMultiplier++;
     }
 
-    public void resetSevenMultiplier(){
-        sevenMultiplyer = 0;
+    public void resetSevenMultiplier() {
+        sevenMultiplier = 0;
     }
 
-    public List<Player> getPlayers(){
+    public int getLeftPlayers() {
+        return leftPlayers;
+    }
+
+    /**
+     * Decreases counter for left players
+     * @return true if only one player is left
+     */
+    public boolean decreaseLeftPlayers(){
+        leftPlayers--;
+        if(leftPlayers == 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
+    }
+
+    public List<Player> getPlayers() {
         return players;
+    }
+
+    public void finishGame(){
+        List<Player> leftPlayer = players.stream().
+                filter(player -> player.getPlace() == -1).
+                collect(Collectors.toList());
+        if(leftPlayer.size() > 1){
+            throw new RuntimeException("Finish game has been called even though more than one player is still active");
+        } else {
+            leftPlayer.get(0).setPlayerFinished();
+        }
     }
 
     void initGame() {
@@ -43,15 +80,13 @@ public class Game {
         shuffleDeck();
         generatePlayers();
         drawFirstStapelCard();
-        System.out.println("Deck: ");
-        deck.forEach(System.out::println);
     }
 
-    public Player getCurrentPlayer(){
+    public Player getCurrentPlayer() {
         return players.get(playerTurn);
     }
 
-    public void setWishedColor(Card.COLOR color){
+    public void setWishedColor(Card.COLOR color) {
         wishedColor = color;
         setNextPlayer();
     }
@@ -82,7 +117,15 @@ public class Game {
     }
 
     private int calculateNextPlayer() {
-        return (playerTurn + 1) % numPlayers;
+        int nextPlayer = playerTurn;
+        int initialPlayer = playerTurn;
+        do {
+            nextPlayer = (nextPlayer + 1) % numPlayers;
+            if(nextPlayer == initialPlayer){
+                throw new RuntimeException("Couldn't find next player");
+            }
+        } while(getPlayers().get(nextPlayer).isPlayerFinished());
+        return nextPlayer;
     }
 
     private void drawFirstStapelCard() {
@@ -109,15 +152,17 @@ public class Game {
     }
 
     //TODO: Later refactor this function so it returns if card is valid to put on or not
+
     /**
      * Adds card to top of the stapel
+     *
      * @param card Card to lay on top of the stapel
      */
     public void requestPutCardOnStapel(Card card) {
         final Card topStapelCard = getTopStapelCard();
         boolean validCard = true;
-        if(topStapelCard.getValue() == Card.JACK){
-            if(card.getColor() == wishedColor) {
+        if (topStapelCard.getValue() == Card.JACK) {
+            if (card.getColor() == wishedColor) {
                 putCardOnStapel(card);
             } else {
                 validCard = false;
@@ -127,7 +172,7 @@ public class Game {
         } else {
             validCard = false;
         }
-        if(!validCard){
+        if (!validCard) {
             throw new RuntimeException("Card " + card + " can't be layed on " + topStapelCard);
         }
     }
@@ -165,7 +210,6 @@ public class Game {
             List<Card> playerCards = drawCardsFromDeck(CARDS_PER_PLAYER);
             player.addCardsToHand(playerCards);
             players.add(player);
-            System.out.println("Player1: \n" + player);
         }
     }
 

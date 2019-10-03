@@ -7,12 +7,12 @@ import static org.junit.Assert.*;
 public class UnitTest {
 
     @Test(expected = RuntimeException.class)
-    public void invalidValueTest(){
-         new Card(Card.COLOR.CARO, 3);
+    public void invalidValueTest() {
+        new Card(Card.COLOR.CARO, 3);
     }
 
     @Test(expected = RuntimeException.class)
-    public void invalidValueTest2(){
+    public void invalidValueTest2() {
         new Card(Card.COLOR.CARO, 15);
     }
 
@@ -34,19 +34,19 @@ public class UnitTest {
     public void deckEmtpyTest() {
         Game game = new Game(5);
         game.initGame();
-        for(int i=0;i<4;i++){
+        for (int i = 0; i < 4; i++) {
             Card card = game.drawCardFromDeck();
             game.putCardOnStapel(card);
         }
     }
 
     @Test(expected = RuntimeException.class)
-    public void tooManyPlayersNotEnoughCardsTest(){
+    public void tooManyPlayersNotEnoughCardsTest() {
         new Game(100).initGame();
     }
 
     @Test
-    public void nextPlayerTest(){
+    public void nextPlayerTest() {
         final Game game = new Game(3);
         game.initGame();
         game.setNextPlayer();
@@ -58,23 +58,43 @@ public class UnitTest {
     }
 
     @Test
-    public void jackOnStapelNextCardIsAsWished(){
+    public void jackOnStapelNextCardIsAsWished() {
         Game game = new Game(3);
         prepareJackTest(game);
+        game.setWishedColor(Card.COLOR.KREUZ);
         Card card = new Card(Card.COLOR.KREUZ, 9);
         game.requestPutCardOnStapel(card);
     }
 
-    @Test (expected = RuntimeException.class)
-    public void jackOnStapelNextCardIsNotAsWished(){
+    @Test
+    public void jackOnStapelNextCardIsAsWishedAndSameColorAsJack() {
         Game game = new Game(3);
         prepareJackTest(game);
+        game.setWishedColor(Card.COLOR.PIK);
+
+        Card card = new Card(Card.COLOR.PIK, 9);
+        game.requestPutCardOnStapel(card);
+    }
+
+    private void prepareJackTest(Game game) {
+        game.initGame();
+        Card card = new Card(Card.COLOR.PIK, Card.JACK);
+        Player currentPlayer = game.getCurrentPlayer();
+        currentPlayer.addCardToHand(card);
+        currentPlayer.playCard(card);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void jackOnStapelNextCardIsNotAsWished() {
+        Game game = new Game(3);
+        prepareJackTest(game);
+        game.setWishedColor(Card.COLOR.KREUZ);
         Card card = new Card(Card.COLOR.PIK, 9);
         game.requestPutCardOnStapel(card);
     }
 
     @Test
-    public void sevenMultiplierTripleTest(){
+    public void sevenMultiplierTripleTest() {
         Game game = new Game(2);
         game.initGame();
         Card kreuz10 = new Card(Card.COLOR.KREUZ, 10);
@@ -98,7 +118,7 @@ public class UnitTest {
     }
 
     @Test
-    public void playerPassesAndDrawsOneCardTest(){
+    public void playerPassesAndDrawsOneCardTest() {
         Game game = new Game(2);
         game.initGame();
         Player player0 = game.getPlayers().get(0);
@@ -109,7 +129,7 @@ public class UnitTest {
     }
 
     @Test
-    public void sevenMultiplierSingleTest(){
+    public void sevenMultiplierSingleTest() {
         Game game = new Game(2);
         game.initGame();
         Card kreuz10 = new Card(Card.COLOR.KREUZ, 10);
@@ -126,11 +146,43 @@ public class UnitTest {
         assertEquals(2, sizeAfter - sizeBefore);
     }
 
-    private void prepareJackTest(Game game) {
+    @Test
+    public void playerFinishedTest() {
+        Game game = new Game(3);
         game.initGame();
-        Card card = new Card(Card.COLOR.PIK, Card.JACK);
-        game.putCardOnStapel(card);
-        game.setWishedColor(Card.COLOR.KREUZ);
+        List<Player> players = game.getPlayers();
+
+        Player player0 = players.get(0);
+        Player player1 = players.get(1);
+        Player player2 = players.get(2);
+
+        player0.getHandCards().clear();
+        player1.getHandCards().clear();
+        player2.getHandCards().clear();
+
+        Card herz9 = new Card(Card.COLOR.HERZ, 9);
+        Card herz10 = new Card(Card.COLOR.HERZ, 10);
+        Card herzKing = new Card(Card.COLOR.HERZ, Card.KING);
+        Card herzQueen = new Card(Card.COLOR.HERZ, Card.QUEEN);
+        Card herzAce = new Card(Card.COLOR.HERZ, Card.ACE);
+
+        game.putCardOnStapel(herzAce);
+        player0.addCardToHand(herz9);
+        player0.addCardToHand(herzKing);
+        player0.addCardToHand(herzKing);
+        player1.addCardToHand(herz10);
+        player2.addCardToHand(herzQueen);
+        player2.addCardToHand(herzQueen);
+
+        player0.playCard(herzAce);
+        player1.playCard(herz10);
+        assertEquals(1, player1.getPlace());
+        player2.playCard(herzQueen);
+        player0.playCard(herzKing);
+        assertTrue(game.getCurrentPlayerId() == player2.getPlayerId());
+        player2.playCard(herzQueen);
+        assertEquals(2, player2.getPlace());
+        assertEquals(3, player0.getPlace());
     }
 
 }

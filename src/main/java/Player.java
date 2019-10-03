@@ -10,7 +10,6 @@ public class Player {
     private List<Card> handCards = new ArrayList<>();
     private Game game;
     private int playerId;
-    //TODO: place
     private int place = -1;
 
     public Player(Game game, int playerId) {
@@ -49,16 +48,43 @@ public class Player {
         }
         game.requestPutCardOnStapel(card);
         handCards.remove(card);
-        if (card.getValue() != Card.JACK) {
-            game.setNextPlayer();
-            return false;
+        boolean jackPlayed = true;
+        boolean gameFinished = false;
+        if(handCards.size() == 0){
+            gameFinished = setPlayerFinished();
+            if(gameFinished){
+                //No need to pick color if only one player is left
+                jackPlayed = false;
+                game.finishGame();
+            }
         }
-        return true;
+        if (card.getValue() != Card.JACK) {
+            if(!gameFinished) {
+                game.setNextPlayer();
+            }
+            jackPlayed = false;
+        }
+        return jackPlayed;
+    }
+
+    public int getPlace(){
+        return place;
+    }
+
+    public boolean setPlayerFinished(){
+        int leftPlayers = game.getLeftPlayers();
+        int numPlayers = game.getNumPlayers();
+        place = numPlayers - leftPlayers + 1;
+        return game.decreaseLeftPlayers();
+    }
+
+    public boolean isPlayerFinished(){
+        return place != -1;
     }
 
     public void pass() {
         int numCardsToDraw = 1;
-        int sevenMultiplier = game.getSevenMultiplyer();
+        int sevenMultiplier = game.getSevenMultiplier();
         if (game.getTopStapelCard().getValue() == 7 && sevenMultiplier != 0) {
             numCardsToDraw = 2*sevenMultiplier;
         }

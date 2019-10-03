@@ -79,28 +79,35 @@ public class Controller {
         vBplayerDisplay.getChildren().clear();
         List<Player> players = game.getPlayers();
         for (int plId = 0; plId < players.size(); plId++) {
-            List<Card> handCards = players.get(plId).getHandCards();
+            Player player = players.get(plId);
+            List<Card> handCards = player.getHandCards();
             TextFlow tFlPlayer = new TextFlow();
             Text playerIdText = new Text("Player " + plId + "\n");
             tFlPlayer.getChildren().add(playerIdText);
-            for (int i = 0; i < handCards.size(); i++) {
-                Card card = handCards.get(i);
-                Text cardText = new Text(i + ": " + card.toPrettyString() + "  ");
-                if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
-                    cardText.setFill(Color.RED);
-                }
-                if (plId == currentPlayerId) {
-                    tFlPlayer.setBackground(
-                            new Background(
-                                    new BackgroundFill(
-                                            Color.web("#9281ED"),
-                                            CornerRadii.EMPTY,
-                                            Insets.EMPTY)
-                            ));
-                } else {
+            if(!player.isPlayerFinished()) {
+                for (int i = 0; i < handCards.size(); i++) {
+                    Card card = handCards.get(i);
+                    Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
+                    if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
+                        cardText.setFill(Color.RED);
+                    }
+                    if (plId == currentPlayerId) {
+                        tFlPlayer.setBackground(
+                                new Background(
+                                        new BackgroundFill(
+                                                Color.web("#9281ED"),
+                                                CornerRadii.EMPTY,
+                                                Insets.EMPTY)
+                                ));
+                    } else {
 
+                    }
+                    tFlPlayer.getChildren().add(cardText);
                 }
-                tFlPlayer.getChildren().add(cardText);
+            } else {
+                int place = player.getPlace();
+                Text placeText = new Text(place + ". place");
+                tFlPlayer.getChildren().add(placeText);
             }
             vBplayerDisplay.getChildren().add(tFlPlayer);
         }

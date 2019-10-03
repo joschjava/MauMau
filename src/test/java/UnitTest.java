@@ -49,8 +49,16 @@ public class UnitTest {
     public void nextPlayerTest() {
         final Game game = new Game(3);
         game.initGame();
+        Card neutralCard = new Card(Card.COLOR.KREUZ, 10);
+        game.putCardOnStapel(neutralCard);
         game.setNextPlayer();
-        assertEquals(1, game.getCurrentPlayerId());
+
+        try {
+            assertEquals(1, game.getCurrentPlayerId());
+        } catch (AssertionError ae) {
+            System.err.println(game.getTopStapelCard());
+            throw ae;
+        }
         Card pik8 = new Card(Card.COLOR.PIK, 8);
         game.putCardOnStapel(pik8);
         game.setNextPlayer();
@@ -76,9 +84,26 @@ public class UnitTest {
         game.requestPutCardOnStapel(card);
     }
 
+    @Test
+    public void jackHerzLayingHerz8() {
+        Game game = new Game(3);
+        game.initGame();
+        Card neutralCard = new Card(Card.COLOR.KREUZ, 10);
+        game.putCardOnStapel(neutralCard);
+        Card card = new Card(Card.COLOR.HERZ, Card.JACK);
+        Player currentPlayer = game.getCurrentPlayer();
+        currentPlayer.addCardToHand(card);
+        currentPlayer.playCard(card);
+        game.setWishedColor(Card.COLOR.HERZ);
+        Card herz8 = new Card(Card.COLOR.HERZ, 8);
+        game.requestPutCardOnStapel(herz8);
+    }
+
     private void prepareJackTest(Game game) {
         game.initGame();
         Card card = new Card(Card.COLOR.PIK, Card.JACK);
+        Card neutralCard = new Card(Card.COLOR.PIK, 10);
+        game.putCardOnStapel(neutralCard);
         Player currentPlayer = game.getCurrentPlayer();
         currentPlayer.addCardToHand(card);
         currentPlayer.playCard(card);
@@ -183,6 +208,70 @@ public class UnitTest {
         player2.playCard(herzQueen);
         assertEquals(2, player2.getPlace());
         assertEquals(3, player0.getPlace());
+    }
+
+    @Test
+    public void firstCardIsSevenUserPasses() {
+        Game game = new Game(3);
+        game.initGame();
+        List<Card> deck = game.getDeck();
+        Card pikSeven = new Card(Card.COLOR.PIK, 7);
+        deck.set(0, pikSeven);
+        game.resetSevenMultiplier();
+        game.drawFirstStapelCard();
+        Player player0 = game.getPlayers().get(0);
+        int sizeBefore = player0.getHandCards().size();
+        player0.pass();
+        int sizeAfter = player0.getHandCards().size();
+        assertEquals(2, sizeAfter - sizeBefore);
+    }
+
+    @Test
+    public void firstCardIsSevenUserPlaysSeven() {
+        Game game = new Game(3);
+        game.initGame();
+        List<Card> deck = game.getDeck();
+        Card pikSeven = new Card(Card.COLOR.PIK, 7);
+        Card caroSeven = new Card(Card.COLOR.CARO, 7);
+        deck.set(0, pikSeven);
+        game.resetSevenMultiplier();
+        game.drawFirstStapelCard();
+        Player player0 = game.getPlayers().get(0);
+        Player player1 = game.getPlayers().get(1);
+        player0.addCardToHand(caroSeven);
+        player0.playCard(caroSeven);
+        int sizeBefore = player1.getHandCards().size();
+        player1.pass();
+        int sizeAfter = player1.getHandCards().size();
+        assertEquals(4, sizeAfter - sizeBefore);
+    }
+
+    @Test
+    public void firstCardIsJackPlayerCanPlayAnything() {
+        Game game = new Game(3);
+        game.initGame();
+        List<Card> deck = game.getDeck();
+        Card pikJack = new Card(Card.COLOR.PIK, Card.JACK);
+        Card caroSeven = new Card(Card.COLOR.CARO, 7);
+        deck.set(0, pikJack);
+        game.resetSevenMultiplier();
+        game.drawFirstStapelCard();
+        Player player0 = game.getPlayers().get(0);
+        player0.addCardToHand(caroSeven);
+        player0.playCard(caroSeven);
+    }
+
+    @Test
+    public void firstCardIsEightFirstUserIsSkipped() {
+        Game game = new Game(3);
+        game.initGame();
+        List<Card> deck = game.getDeck();
+        Card caro8 = new Card(Card.COLOR.CARO, 8);
+        int nextPlayerBefore = game.getCurrentPlayerId();
+        deck.set(0, caro8);
+        game.resetSevenMultiplier();
+        game.drawFirstStapelCard();
+        assertEquals(1, game.getCurrentPlayerId() - nextPlayerBefore);
     }
 
 }

@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Game {
 
@@ -17,6 +16,10 @@ public class Game {
     public List<Player> players = new ArrayList<>();
     private int playerTurn = 0;
     private int leftPlayers;
+
+    // If the first card on stapel is jack at game beginning
+    private boolean firstCardIsJack = false;
+
 
     private Card.COLOR wishedColor = null;
 
@@ -41,13 +44,18 @@ public class Game {
         return leftPlayers;
     }
 
+    public List<Card> getDeck(){
+        return deck;
+    }
+
     /**
      * Decreases counter for left players
+     *
      * @return true if only one player is left
      */
-    public boolean decreaseLeftPlayers(){
+    public boolean decreaseLeftPlayers() {
         leftPlayers--;
-        if(leftPlayers == 1){
+        if (leftPlayers == 1) {
             return true;
         } else {
             return false;
@@ -62,11 +70,11 @@ public class Game {
         return players;
     }
 
-    public void finishGame(){
+    public void finishGame() {
         List<Player> leftPlayer = players.stream().
                 filter(player -> player.getPlace() == -1).
                 collect(Collectors.toList());
-        if(leftPlayer.size() > 1){
+        if (leftPlayer.size() > 1) {
             throw new RuntimeException("Finish game has been called even though more than one player is still active");
         } else {
             leftPlayer.get(0).setPlayerFinished();
@@ -121,16 +129,23 @@ public class Game {
         int initialPlayer = playerTurn;
         do {
             nextPlayer = (nextPlayer + 1) % numPlayers;
-            if(nextPlayer == initialPlayer){
+            if (nextPlayer == initialPlayer) {
                 throw new RuntimeException("Couldn't find next player");
             }
-        } while(getPlayers().get(nextPlayer).isPlayerFinished());
+        } while (getPlayers().get(nextPlayer).isPlayerFinished());
         return nextPlayer;
     }
 
-    private void drawFirstStapelCard() {
+    public void drawFirstStapelCard() {
         final Card firstStapelCard = drawCardFromDeck();
-        //TODO: Wish when Jack
+
+        if(firstStapelCard.getValue() == 7){
+            increaseSevenMultiplier();
+        } else if (firstStapelCard.getValue() == 8){
+            playerTurn = calculateNextPlayer();
+        } else if(firstStapelCard.getValue() == Card.JACK){
+            firstCardIsJack = true;
+        }
         putCardOnStapel(firstStapelCard);
     }
 
@@ -161,20 +176,48 @@ public class Game {
     public void requestPutCardOnStapel(Card card) {
         final Card topStapelCard = getTopStapelCard();
         boolean validCard = true;
-        if (topStapelCard.getValue() == Card.JACK) {
-            if (card.getColor() == wishedColor) {
+        if(firstCardIsJack){
+            putCardOnStapel(card);
+            firstCardIsJack = false;
+        } else {
+            //TODO: If 7 is on top, only 7 allowed
+            if (topStapelCard.getValue() == Card.JACK) {
+                if (card.getColor() == wishedColor) {
+                    putCardOnStapel(card);
+                } else {
+                    validCard = false;
+                }
+            } else if (card.canBeLayedOn(topStapelCard)) {
                 putCardOnStapel(card);
             } else {
                 validCard = false;
             }
-        } else if (card.canBeLayedOn(topStapelCard)) {
-            putCardOnStapel(card);
-        } else {
-            validCard = false;
+            if (!validCard) {
+                printGameInformation();
+                throw new RuntimeException("Card " + card + " can't be layed on " + topStapelCard);
+            }
         }
-        if (!validCard) {
-            throw new RuntimeException("Card " + card + " can't be layed on " + topStapelCard);
-        }
+    }
+
+    private void printGameInformation(){
+        StringBuilder sb = new StringBuilder();
+        getPlayers().forEach(player -> {
+            String currentPlayerDisplay = "";
+            if(playerTurn == player.getPlayerId()){
+                currentPlayerDisplay = "(current)";
+            }
+            sb.append("Player " + player.getPlayerId() +" "+ currentPlayerDisplay + "\n");
+            sb.append("Handcards:" + player.getHandCards() + "\n");
+            sb.append("Place: " + player.getPlace() + "\n");
+            sb.append("\n");
+        });
+        sb.append("Wished Color: " + wishedColor + "\n");
+        sb.append("Oberste Stapelkarte: " + getTopStapelCard() + "\n");
+        sb.append("Stapel: " + "\n");
+        stapel.forEach(card1 -> sb.append(card1 + "\n"));
+        sb.append("Deck: ");
+        deck.forEach(card2 -> sb.append(card2 + "\n"));
+        System.out.println(sb.toString());
     }
 
     public void putCardOnStapel(Card card) {
@@ -187,6 +230,7 @@ public class Game {
             List<Card> stapelCards = stapel.subList(0, stapel.size() - 1);//keep one card
             deck.addAll(stapelCards);
             stapel.removeAll(stapelCards);
+            shuffleDeck();
         }
         Card drawnCard = deck.get(0);
         deck.remove(0);

@@ -2,13 +2,15 @@
 
 <!--<?import javafx.scene.layout.GridPane?>-->
 <?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="Controller">
+<GridPane alignment="CENTER" hgap="50.0" vgap="50.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="Controller">
   <children>
     <Button id="testButton" fx:id="btSubmit" mnemonicParsing="false" text="Play Card" GridPane.columnIndex="1" GridPane.rowIndex="4" />
     <Button id="passButton" fx:id="btPass" mnemonicParsing="false" text="Pass" GridPane.columnIndex="2" GridPane.rowIndex="4" />
@@ -17,18 +19,26 @@
     <Label fx:id="lbStapel" text="Stapel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
     <HBox fx:id="hbJackPickerBox" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="5">
       <children>
-        <Button fx:id="btCaro" mnemonicParsing="false" text="♦" />
-        <Button fx:id="btHerz" mnemonicParsing="false" text="♥" />
-        <Button fx:id="btPik" mnemonicParsing="false" text="♠" />
-        <Button fx:id="btKreuz" mnemonicParsing="false" text="♣" />
+        <Button fx:id="btCaro" mnemonicParsing="false" text="♦">
+          <font>
+            <Font size="20.0" fx:id="x1" />
+          </font>
+        </Button>
+        <Button fx:id="btHerz" font="$x1" mnemonicParsing="false" text="♥" />
+        <Button fx:id="btPik" font="$x1" mnemonicParsing="false" text="♠" />
+        <Button fx:id="btKreuz" font="$x1" mnemonicParsing="false" text="♣" />
       </children>
     </HBox>
+    <HBox fx:id="hbDeck" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="0" GridPane.rowIndex="0" />
   </children>
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
   </columnConstraints>
+  <padding>
+    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+  </padding>
   <rowConstraints>
     <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
     <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />

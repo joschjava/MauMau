@@ -3,6 +3,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -42,6 +43,9 @@ public class Controller {
     @FXML
     HBox hbJackPickerBox;
 
+    @FXML
+    HBox hbDeck;
+
     Game game;
 
     @FXML
@@ -54,6 +58,12 @@ public class Controller {
             passAction();
             updateGui();
         });
+        tfInput.setOnKeyPressed(ae -> {
+            if(ae.getCode().equals(KeyCode.ENTER)){
+                submitAction();
+                updateGui();
+            }
+        });
         setJackChooserButtonListener(btPik, Card.COLOR.PIK);
         setJackChooserButtonListener(btHerz, Card.COLOR.HERZ);
         setJackChooserButtonListener(btCaro, Card.COLOR.CARO);
@@ -61,13 +71,11 @@ public class Controller {
 
         game = new Game(3);
         game.initGame();
-        Card card = new Card(Card.COLOR.HERZ, Card.JACK);
-        game.getPlayers().get(0).addCardToHand(card);
         hbJackPickerBox.setVisible(false);
         updateGui();
     }
 
-    public void setJackChooserButtonListener(Button button, Card.COLOR color){
+    public void setJackChooserButtonListener(Button button, Card.COLOR color) {
         button.setOnAction(event -> {
             wishColor(color);
             updateGui();
@@ -78,19 +86,29 @@ public class Controller {
         int currentPlayerId = game.getCurrentPlayerId();
         vBplayerDisplay.getChildren().clear();
         List<Player> players = game.getPlayers();
+        List<Card> deck = game.getDeck();
+        int shownCards = 6;
+        if (deck.size() < shownCards) {
+            shownCards = deck.size();
+        }
+        List<Card> cards = deck.subList(0, shownCards);
+        hbDeck.getChildren().clear();
+        for (int i = 0; i < cards.size(); i++) {
+            Text cardText = createColoredText(cards.get(i), i);
+            hbDeck.getChildren().add(cardText);
+        }
+
+
         for (int plId = 0; plId < players.size(); plId++) {
             Player player = players.get(plId);
             List<Card> handCards = player.getHandCards();
             TextFlow tFlPlayer = new TextFlow();
-            Text playerIdText = new Text("Player " + plId + "\n");
+            Text playerIdText = new Text("Player " + plId + " (" + handCards.size() + ")\n");
             tFlPlayer.getChildren().add(playerIdText);
-            if(!player.isPlayerFinished()) {
+            if (!player.isPlayerFinished()) {
                 for (int i = 0; i < handCards.size(); i++) {
                     Card card = handCards.get(i);
-                    Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
-                    if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
-                        cardText.setFill(Color.RED);
-                    }
+                    Text cardText = createColoredText(card, i);
                     if (plId == currentPlayerId) {
                         tFlPlayer.setBackground(
                                 new Background(
@@ -99,8 +117,6 @@ public class Controller {
                                                 CornerRadii.EMPTY,
                                                 Insets.EMPTY)
                                 ));
-                    } else {
-
                     }
                     tFlPlayer.getChildren().add(cardText);
                 }
@@ -113,11 +129,19 @@ public class Controller {
         }
         Card stapelCard = game.getTopStapelCard();
         if (stapelCard.getColor() == Card.COLOR.HERZ || stapelCard.getColor() == Card.COLOR.CARO) {
-            lbStapel.setTextFill(Color.RED);
+            lbStapel.setTextFill(Color.ORANGE);
         } else {
             lbStapel.setTextFill(Color.BLACK);
         }
         lbStapel.setText(stapelCard.toPrettyString());
+    }
+
+    private Text createColoredText(Card card, int i) {
+        Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
+        if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
+            cardText.setFill(Color.ORANGE);
+        }
+        return cardText;
     }
 
     public void submitAction() {

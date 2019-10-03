@@ -1,16 +1,15 @@
-import lombok.Data;
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Getter
 public class Game {
 
     private List<Card> deck = new ArrayList<>();
     private List<Card> stapel = new ArrayList<>();
     private int numPlayers;
+    // If 7 is put on top of other 7s cards to draw increase
+    public int sevenMultiplyer = 0;
+
 
     private int CARDS_PER_PLAYER = 6;
     public List<Player> players = new ArrayList<>();
@@ -19,6 +18,22 @@ public class Game {
 
     Game(int numPlayers) {
         this.numPlayers = numPlayers;
+    }
+
+    public int getSevenMultiplyer(){
+        return sevenMultiplyer;
+    }
+
+    public void increaseSevenMultiplier(){
+        sevenMultiplyer++;
+    }
+
+    public void resetSevenMultiplier(){
+        sevenMultiplyer = 0;
+    }
+
+    public List<Player> getPlayers(){
+        return players;
     }
 
     void initGame() {

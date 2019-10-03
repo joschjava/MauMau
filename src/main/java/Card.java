@@ -14,7 +14,6 @@ public class Card implements Comparable<Card> {
     @Override
     public int compareTo(Card card) {
         if (card.getValue() > value) {
-            System.out.println(card.getValue() + ">" + value);
             return -1;
         } else if (card.getValue() == value) {
             if (colorToValue(color) > colorToValue(card.getColor())) {
@@ -23,7 +22,6 @@ public class Card implements Comparable<Card> {
                 return -1;
             }
         } else {
-            System.out.println(card.getValue() + "<=" + value);
             return 1;
         }
     }

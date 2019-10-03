@@ -1,5 +1,7 @@
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class UnitTest {
@@ -69,6 +71,59 @@ public class UnitTest {
         prepareJackTest(game);
         Card card = new Card(Card.COLOR.PIK, 9);
         game.requestPutCardOnStapel(card);
+    }
+
+    @Test
+    public void sevenMultiplierTripleTest(){
+        Game game = new Game(2);
+        game.initGame();
+        Card kreuz10 = new Card(Card.COLOR.KREUZ, 10);
+        Card kreuz7 = new Card(Card.COLOR.KREUZ, 7);
+        Card pik7 = new Card(Card.COLOR.PIK, 7);
+        Card herz7 = new Card(Card.COLOR.HERZ, 7);
+        game.putCardOnStapel(kreuz10);
+        List<Player> players = game.getPlayers();
+        Player player0 = players.get(0);
+        Player player1 = players.get(1);
+        player0.addCardToHand(kreuz7);
+        player0.addCardToHand(pik7);
+        player1.addCardToHand(herz7);
+        player0.playCard(kreuz7);
+        player1.playCard(herz7);
+        player0.playCard(pik7);
+        int sizeBefore = player1.getHandCards().size();
+        player1.pass();
+        int sizeAfter = player1.getHandCards().size();
+        assertEquals(6, sizeAfter - sizeBefore);
+    }
+
+    @Test
+    public void playerPassesAndDrawsOneCardTest(){
+        Game game = new Game(2);
+        game.initGame();
+        Player player0 = game.getPlayers().get(0);
+        int sizeBefore = player0.getHandCards().size();
+        player0.pass();
+        int sizeAfter = player0.getHandCards().size();
+        assertEquals(1, sizeAfter - sizeBefore);
+    }
+
+    @Test
+    public void sevenMultiplierSingleTest(){
+        Game game = new Game(2);
+        game.initGame();
+        Card kreuz10 = new Card(Card.COLOR.KREUZ, 10);
+        Card kreuz7 = new Card(Card.COLOR.KREUZ, 7);
+        game.putCardOnStapel(kreuz10);
+        List<Player> players = game.getPlayers();
+        Player player0 = players.get(0);
+        Player player1 = players.get(1);
+        player0.addCardToHand(kreuz7);
+        player0.playCard(kreuz7);
+        int sizeBefore = player1.getHandCards().size();
+        player1.pass();
+        int sizeAfter = player1.getHandCards().size();
+        assertEquals(2, sizeAfter - sizeBefore);
     }
 
     private void prepareJackTest(Game game) {

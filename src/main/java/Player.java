@@ -18,39 +18,42 @@ public class Player {
         this.game = game;
     }
 
-    public void addCardsToHand(List<Card> cards){
+    public void addCardsToHand(List<Card> cards) {
         handCards.addAll(cards);
         Collections.sort(handCards);
     }
 
-    public void addCardToHand(Card card){
+    public void addCardToHand(Card card) {
         handCards.add(card);
         Collections.sort(handCards);
     }
 
-    public void playCardId(int i){
+    public void playCardId(int i) {
         Card card = handCards.get(i);
         playCard(card);
     }
 
-    public void playCard(Card card){
-        if(card.getValue() == Card.JACK){
+    public void playCard(Card card) {
+        if (card.getValue() == Card.JACK) {
             //TODO: Require User Action
+        } else if (card.getValue() == 7){
+            game.increaseSevenMultiplier();
         }
         game.requestPutCardOnStapel(card);
         handCards.remove(card);
         game.setNextPlayer();
     }
 
-    public void pass(){
-        if(game.getTopStapelCard().getValue() == 7){
-            List<Card> penaltyCards = game.drawCardsFromDeck(2);
-            addCardsToHand(penaltyCards);
-        } else {
-            Card card = game.drawCardFromDeck();
-            addCardToHand(card);
-            game.setNextPlayer();
+    public void pass() {
+        int numCardsToDraw = 1;
+        int sevenMultiplier = game.getSevenMultiplyer();
+        if (game.getTopStapelCard().getValue() == 7 && sevenMultiplier != 0) {
+            numCardsToDraw = 2*sevenMultiplier;
         }
+        List<Card> penaltyCards = game.drawCardsFromDeck(numCardsToDraw);
+        game.resetSevenMultiplier();
+        addCardsToHand(penaltyCards);
+        game.setNextPlayer();
     }
 
     public List<Card> getHandCards() {

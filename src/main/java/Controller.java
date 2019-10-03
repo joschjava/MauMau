@@ -72,6 +72,8 @@ public class Controller {
                                             CornerRadii.EMPTY,
                                             Insets.EMPTY)
                             ));
+                } else {
+
                 }
                 tFlPlayer.getChildren().add(cardText);
             }
@@ -80,6 +82,8 @@ public class Controller {
         Card stapelCard = game.getTopStapelCard();
         if (stapelCard.getColor() == Card.COLOR.HERZ || stapelCard.getColor() == Card.COLOR.CARO) {
             lbStapel.setTextFill(Color.RED);
+        } else {
+            lbStapel.setTextFill(Color.BLACK);
         }
         lbStapel.setText(stapelCard.toPrettyString());
     }

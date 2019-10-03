@@ -109,7 +109,6 @@ public class Game {
 
     public void setWishedColor(Card.COLOR color) {
         wishedColor = color;
-        setNextPlayer();
     }
 
     public void setNextPlayer() {
@@ -127,14 +126,15 @@ public class Game {
             System.out.println("Skipped player " + getCurrentPlayerId());
             currentPlayer.pass();
         }
-        if(currentPlayer.isAi()){
-           AI ai = currentPlayer.getAi();
-           Card card = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
-           if(card != null){
-           boolean isJack = currentPlayer.playCard(card);
-           } else {
-               currentPlayer.pass();
-           }
+        if (currentPlayer.isAi()) {
+            AI ai = currentPlayer.getAi();
+            Card card = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
+            if (card != null) {
+                CardAction cardAction = new CardAction(card);
+                currentPlayer.playCard(cardAction);
+            } else {
+                currentPlayer.pass();
+            }
         }
     }
 
@@ -241,7 +241,6 @@ public class Game {
             validCard = true;
             firstCardIsJack = false;
         } else {
-
             if (topStapelCard.getValue() == Card.JACK) {
                 if (card.getColor() == wishedColor) {
                     validCard = true;
@@ -291,7 +290,9 @@ public class Game {
             eightIsPaid = false;
         }
         stapel.add(card);
-        wishedColor = null;
+        if(card.getValue()!= Card.JACK) {
+            wishedColor = null;
+        }
     }
 
     public Card drawCardFromDeck() {
@@ -300,6 +301,9 @@ public class Game {
             deck.addAll(stapelCards);
             stapel.removeAll(stapelCards);
             shuffleDeck();
+        }
+        if(deck.size() == 0){
+            throw new RuntimeException("Deck shouldn't be empty");
         }
         Card drawnCard = deck.get(0);
         deck.remove(0);
@@ -314,12 +318,12 @@ public class Game {
         return drawnCards;
     }
 
-    private void generatePlayers(){
+    private void generatePlayers() {
         generatePlayers(null);
     }
 
     private void generatePlayers(List<AI> ais) {
-        if(ais != null) {
+        if (ais != null) {
             if (ais.size() != numPlayers) {
                 throw new RuntimeException("AI length is not the same as possible players");
             }
@@ -329,10 +333,17 @@ public class Game {
             throw new RuntimeException("Not enough cards (" + deck.size() + ") for " + numPlayers + " Players");
         }
         for (int i = 0; i < numPlayers; i++) {
-            Player player = new Player(this, i, ais.get(i));
+            Player player;
+            if (ais == null) {
+                player = new Player(this, i, null);
+            } else {
+                player = new Player(this, i, ais.get(i));
+            }
             List<Card> playerCards = drawCardsFromDeck(CARDS_PER_PLAYER);
             player.addCardsToHand(playerCards);
             players.add(player);
+            Card jackCard = new Card(Card.COLOR.KREUZ, Card.JACK);
+            player.addCardToHand(jackCard);
         }
     }
 

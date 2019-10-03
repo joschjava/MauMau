@@ -18,14 +18,14 @@ public class Player {
         this(game, playerId, null);
     }
 
-    public Player(Game game, int playerId, AI ai){
+    public Player(Game game, int playerId, AI ai) {
         this.playerId = playerId;
         this.game = game;
         this.ai = ai;
     }
 
-    public boolean isAi(){
-        if(ai == null){
+    public boolean isAi() {
+        if (ai == null) {
             return false;
         } else {
             return true;
@@ -42,58 +42,51 @@ public class Player {
         Collections.sort(handCards);
     }
 
-    /**
-     * Put card on deck
-     * @param id Id of handcard of player
-     * @return true if played card was Jack and player needs to pick color, false otherwise
-     */
-    public boolean playCardId(int id) {
-        Card card = handCards.get(id);
-        return playCard(card);
+    public Card getCardFromId(int id) {
+        return handCards.get(id);
     }
 
     /**
      * Put card on deck
-     * @param card The card to put onto deck
+     *
+     * @param cardAction The card to put onto deck
      * @return true if played card was Jack and player needs to pick color, false otherwise
      */
-    public boolean playCard(Card card) {
-         if (card.getValue() == 7){
+    public void playCard(CardAction cardAction) {
+        Card card = cardAction.getCard();
+        if (card.getValue() == 7) {
             game.increaseSevenMultiplier();
+        } else if (cardAction.isJack()) {
+            Card.COLOR wishedColor = cardAction.getJackWishColor();
+            game.setWishedColor(wishedColor);
+            System.out.println("Setting wished color: " + wishedColor);
         }
         game.requestPutCardOnStapel(card);
         handCards.remove(card);
-        boolean jackPlayed = true;
         boolean gameFinished = false;
-        if(handCards.size() == 0){
+        if (handCards.size() == 0) {
             gameFinished = setPlayerFinished();
-            if(gameFinished){
-                //No need to pick color if only one player is left
-                jackPlayed = false;
+            if (gameFinished) {
                 game.finishGame();
             }
         }
-        if (card.getValue() != Card.JACK) {
-            if(!gameFinished) {
-                game.setNextPlayer();
-            }
-            jackPlayed = false;
+        if (!gameFinished) {
+            game.setNextPlayer();
         }
-        return jackPlayed;
     }
 
-    public int getPlace(){
+    public int getPlace() {
         return place;
     }
 
-    public boolean setPlayerFinished(){
+    public boolean setPlayerFinished() {
         int leftPlayers = game.getLeftPlayers();
         int numPlayers = game.getNumPlayers();
         place = numPlayers - leftPlayers + 1;
         return game.decreaseLeftPlayers();
     }
 
-    public boolean isPlayerFinished(){
+    public boolean isPlayerFinished() {
         return place != -1;
     }
 
@@ -101,7 +94,7 @@ public class Player {
         int numCardsToDraw = 1;
         int sevenMultiplier = game.getSevenMultiplier();
         if (game.getTopStapelCard().getValue() == 7 && sevenMultiplier != 0) {
-            numCardsToDraw = 2*sevenMultiplier;
+            numCardsToDraw = 2 * sevenMultiplier;
         }
         List<Card> penaltyCards = game.drawCardsFromDeck(numCardsToDraw);
         game.resetSevenMultiplier();

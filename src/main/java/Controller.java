@@ -49,6 +49,8 @@ public class Controller {
 
     Game game;
 
+    private CardAction cardAction;
+
     @FXML
     public void initialize() {
         btSubmit.setOnAction(event -> {
@@ -60,7 +62,7 @@ public class Controller {
             updateGui();
         });
         tfInput.setOnKeyPressed(ae -> {
-            if(ae.getCode().equals(KeyCode.ENTER)){
+            if (ae.getCode().equals(KeyCode.ENTER)) {
                 submitAction();
                 updateGui();
             }
@@ -75,7 +77,7 @@ public class Controller {
         ais.add(null);
         ais.add(new RandomAI(game));
         ais.add(new RandomAI(game));
-        game.initGame(ais);
+        game.initGame();
         hbJackPickerBox.setVisible(false);
         updateGui();
     }
@@ -147,7 +149,7 @@ public class Controller {
 
     private Text createColoredText(Card card, int i, boolean validMove) {
         Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
-        if(validMove){
+        if (validMove) {
             if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
                 cardText.setFill(Color.ORANGE);
             }
@@ -162,14 +164,24 @@ public class Controller {
         tfInput.setText("");
         int cardId = Integer.valueOf(text);
         Player currentPlayer = game.getCurrentPlayer();
-        boolean jackLaid = currentPlayer.playCardId(cardId);
-        if (jackLaid) {
+        Card card = currentPlayer.getCardFromId(cardId);
+
+        cardAction = new CardAction(card);
+        if (cardAction.isJack()) {
             hbJackPickerBox.setVisible(true);
+        } else {
+            currentPlayer.playCard(cardAction);
+            cardAction = null;
         }
     }
 
     public void wishColor(Card.COLOR color) {
-        game.setWishedColor(color);
+        if(cardAction != null){
+            cardAction.setJackWishColor(color);
+            game.getCurrentPlayer().playCard(cardAction);
+        } else {
+            throw new RuntimeException("Couldn't find any cardAction for my Jack");
+        }
         hbJackPickerBox.setVisible(false);
     }
 

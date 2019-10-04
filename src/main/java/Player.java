@@ -56,14 +56,15 @@ public class Player {
         Card card = cardAction.getCard();
         if (card.getValue() == 7) {
             game.increaseSevenMultiplier();
-        } else if (cardAction.isJack()) {
-            Card.COLOR wishedColor = cardAction.getJackWishColor();
-            game.setWishedColor(wishedColor);
-            System.out.println("Setting wished color: " + wishedColor);
         }
         System.out.println("Player "+playerId + " plays "+card);
         game.requestPutCardOnStapel(card);
         handCards.remove(card);
+        if (cardAction.isJack()) {
+            Card.COLOR wishedColor = cardAction.getJackWishColor();
+            game.setWishedColor(wishedColor);
+            System.out.println("Setting wished color: " + wishedColor);
+        }
         boolean gameFinished = false;
         if (handCards.size() == 0) {
             gameFinished = setPlayerFinished();
@@ -99,6 +100,7 @@ public class Player {
         if (game.getTopStapelCard().getValue() == 7 && sevenMultiplier != 0) {
             numCardsToDraw = 2 * sevenMultiplier;
         }
+        System.out.println("Player "+playerId+" draws "+numCardsToDraw+" penalty cards");
         List<Card> penaltyCards = game.drawCardsFromDeck(numCardsToDraw);
         game.resetSevenMultiplier();
         addCardsToHand(penaltyCards);

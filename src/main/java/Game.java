@@ -1,4 +1,5 @@
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +31,15 @@ public class Game {
 
     private Card.COLOR wishedColor = null;
 
+    private boolean gameFinished = false;
+
     Game(int numPlayers) {
         this.numPlayers = numPlayers;
         this.leftPlayers = numPlayers;
+    }
+
+    public boolean isGameFinished() {
+        return gameFinished;
     }
 
     public int getSevenMultiplier() {
@@ -78,6 +85,7 @@ public class Game {
     }
 
     public void finishGame() {
+        gameFinished = true;
         List<Player> leftPlayer = players.stream().
                 filter(player -> player.getPlace() == -1).
                 collect(Collectors.toList());
@@ -102,8 +110,8 @@ public class Game {
         } else {
             generatePlayers(ais);
         }
-        Card card = new Card(Card.COLOR.PIK, Card.JACK);
-        deck.set(0, card);
+//        Card card = new Card(Card.COLOR.PIK, 8);
+//        deck.set(0, card);
         drawFirstStapelCard();
     }
 
@@ -126,9 +134,10 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
+        System.out.println("setNextPlayerDone");
     }
 
-    public void triggerNextPlayerAction(){
+    public void triggerNextPlayerAction() {
         if (hasPlayerPlayableCards()) {
             Player currentPlayer = getCurrentPlayer();
             if (currentPlayer.isAi()) {
@@ -137,20 +146,16 @@ public class Game {
                 if (cardAction.getCard() != null) {
                     currentPlayer.playCard(cardAction);
                 } else {
-                    throw new RuntimeException("Player(AI) "+currentPlayer.getPlayerId()+" has no playable card but should have");
+                    throw new RuntimeException("Player(AI) " + currentPlayer.getPlayerId() + " has no playable card but should have");
                 }
             }
         } else {
-            if (getCurrentPlayerId() == 0) {
-                System.out.println("Human Player has no playable cards");
-            } else {
-                System.out.println("Skipped player " + getCurrentPlayerId());
-                getCurrentPlayer().pass();
-            }
+            System.out.println("Skipped player " + getCurrentPlayerId());
+            getCurrentPlayer().pass();
         }
     }
 
-    public boolean hasPlayerPlayableCards(){
+    public boolean hasPlayerPlayableCards() {
         return hasPlayerPlayableCards(false);
     }
 
@@ -160,7 +165,7 @@ public class Game {
         for (int i = 0; i < handCards.size(); i++) {
             Card playableCard = handCards.get(i);
             if (isValidMove(playableCard, debug)) {
-                if(debug) {
+                if (debug) {
                     System.out.println("Playable card found: " + playableCard);
                 }
                 hasValidCards = true;
@@ -243,13 +248,14 @@ public class Game {
             putCardOnStapel(card);
             firstCardIsJack = false;
         } else {
+            isValidMove(card, true);
             printGameInformation();
             throw new RuntimeException("Card " + card + " can't be layed on '" + getTopStapelCard() + "'");
         }
     }
 
-    public boolean isValidMove(Card card){
-       return isValidMove(card, false);
+    public boolean isValidMove(Card card) {
+        return isValidMove(card, false);
     }
 
     public boolean isValidMove(Card card, boolean debug) {
@@ -263,16 +269,16 @@ public class Game {
                     validCard = true;
                 } else {
                     validCard = false;
-                    if(debug){
+                    if (debug) {
                         System.out.println(card + " not playable: stapel is jack, wished color is not the same: ");
-                        System.out.println("Game.wishedColor: "+wishedColor+", Card Color: "+card.getValue());
+                        System.out.println("Game.wishedColor: " + wishedColor + ", Card Color: " + card.getColor());
                     }
                 }
             } else if (topStapelCard.getValue() == 7 && sevenMultiplier != 0) {
                 if (card.getValue() == 7) {
                     validCard = true;
                 } else {
-                    if(debug) {
+                    if (debug) {
                         System.out.println(card + " is not playable: Must be 7");
                     }
                     validCard = false;

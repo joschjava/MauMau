@@ -1,10 +1,10 @@
 import java.util.List;
-import java.util.Random;
 
 public class RandomAI extends AI {
 
     public RandomAI(Game game) {
         super(game);
+        aiName = "Random AI";
     }
 
     @Override
@@ -27,6 +27,7 @@ public class RandomAI extends AI {
 //        System.out.println("Player "+game.getCurrentPlayerId() + ": I'm playing " + card.toString());
         return cardAction;
     }
+
 
 
 

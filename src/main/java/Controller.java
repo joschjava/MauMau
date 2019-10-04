@@ -57,6 +57,8 @@ public class Controller {
 
     Game game;
 
+    private static int aiThinkTimeMs = 1000;
+
     private CardAction cardAction;
 
     @FXML
@@ -65,16 +67,16 @@ public class Controller {
             setNextPlayerButtonAction();
         });
         btPass.setOnAction(event -> {
-            passAction();
-            updateGui();
-            setDelayedNextPlayer();
+            buttonPassAction();
         });
         tfInput.setOnKeyPressed(ae -> {
             if (ae.getCode().equals(KeyCode.ENTER)) {
                 String text = tfInput.getText();
                 if(text.equals("d")){
                     game.hasPlayerPlayableCards(true);
-                    tfInput.setText("");
+
+                } else if(text.equals("+")){
+                    buttonPassAction();
                 } else {
                     if(text.equals("")){
                         game.setNextPlayer();
@@ -83,6 +85,7 @@ public class Controller {
                         setNextPlayerButtonAction();
                     }
                 }
+                tfInput.setText("");
             }
         });
         btSetNextPlayer.setOnAction(event -> {
@@ -97,31 +100,53 @@ public class Controller {
 
         game = new Game(3);
         List<AI> ais = new ArrayList<>();
-        ais.add(null);
+        ais.add(new RandomAI(game));
         ais.add(new RandomAI(game));
         ais.add(new RandomAI(game));
         game.initGame(ais);
         hbJackPickerBox.setVisible(false);
         updateGui();
+        if(game.getCurrentPlayer().isAi()){
+            setDelayedNextPlayerExceptGameIsFinished();
+        }
+    }
+
+    private void buttonPassAction() {
+        System.out.println("buttonPassAction");
+        passAction();
+        updateGui();
+        setDelayedNextPlayerExceptGameIsFinished();
     }
 
     private void setNextPlayerButtonAction() {
-        submitAction();
+        System.out.println("setNextPlayerButtonAction");
+        boolean jackPlayed = submitAction();
         updateGui();
-        setDelayedNextPlayer();
+        if(!jackPlayed){
+            setDelayedNextPlayerExceptGameIsFinished();
+        }
     }
 
-    public void setDelayedNextPlayer(){
-        Timeline timeline = new Timeline(new KeyFrame(
-                Duration.millis(2500),
-                ae -> {
-                    game.triggerNextPlayerAction();
-                    updateGui();
-                    if(game.getCurrentPlayer().isAi()){
-                        setDelayedNextPlayer();
-                    }
-                }));
-        timeline.play();
+    public void setDelayedNextPlayerExceptGameIsFinished(){
+        System.out.println("setDelayedNextPlayerExceptGameIsFinished called");
+        if(!game.isGameFinished()) {
+            System.out.println("Setting delayed next player");
+            Timeline timeline = new Timeline(new KeyFrame(
+                    Duration.millis(aiThinkTimeMs),
+                    ae -> {
+                        System.out.println("Delayed next player action triggered");
+                        game.triggerNextPlayerAction();
+                        updateGui();
+                        if (game.getCurrentPlayer().isAi()) {
+                            setDelayedNextPlayerExceptGameIsFinished();
+                        } else {
+                            System.out.println("Next player not ai");
+                        }
+                    }));
+            timeline.play();
+        } else {
+            System.out.println("Game is finished");
+        }
     }
 
     public void setJackChooserButtonListener(Button button, Card.COLOR color) {
@@ -151,7 +176,14 @@ public class Controller {
             Player player = players.get(plId);
             List<Card> handCards = player.getHandCards();
             TextFlow tFlPlayer = new TextFlow();
-            Text playerIdText = new Text("Player " + plId + " (" + handCards.size() + ")\n");
+            String aiText = "";
+            if(player.isAi()){
+                aiText = "("+player.getAi().getAiName()+")";
+                if(player == game.getCurrentPlayer()){
+                    aiText += " thinking...";
+                }
+            }
+            Text playerIdText = new Text("Player " + plId + " "+aiText+" (" + handCards.size() + ")\n");
             tFlPlayer.getChildren().add(playerIdText);
             if (!player.isPlayerFinished()) {
                 for (int i = 0; i < handCards.size(); i++) {
@@ -200,19 +232,24 @@ public class Controller {
         return cardText;
     }
 
-    public void submitAction() {
+    /**
+     * Plays selected card
+     * @return true if played card is jack, false otherwise
+     */
+    public boolean submitAction() {
         String text = tfInput.getText();
         tfInput.setText("");
         int cardId = Integer.valueOf(text);
         Player currentPlayer = game.getCurrentPlayer();
         Card card = currentPlayer.getCardFromId(cardId);
-
         cardAction = new CardAction(card);
         if (cardAction.isJack()) {
             hbJackPickerBox.setVisible(true);
+            return true;
         } else {
             currentPlayer.playCard(cardAction);
             cardAction = null;
+            return false;
         }
     }
 
@@ -223,6 +260,7 @@ public class Controller {
         } else {
             throw new RuntimeException("Couldn't find any cardAction for my Jack");
         }
+        setDelayedNextPlayerExceptGameIsFinished();
         hbJackPickerBox.setVisible(false);
     }
 

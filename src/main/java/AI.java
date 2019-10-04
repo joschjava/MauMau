@@ -7,6 +7,11 @@ import java.util.List;
 abstract class AI {
 
     Game game;
+    String aiName;
+
+    AI(Game game){
+        this.game = game;
+    }
 
     List<Card> getPossiblePlayableCards(List<Card> handCards){
         List<Card> possibleCards = new ArrayList<>();
@@ -20,4 +25,8 @@ abstract class AI {
     }
 
     abstract CardAction makeMove(List<Card> handCards, Card stapelCard);
+
+    public String getAiName(){
+        return aiName;
+    }
 }

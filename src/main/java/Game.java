@@ -1,8 +1,10 @@
+import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class Game {
 
     private List<Card> deck = new ArrayList<>();
@@ -310,7 +312,7 @@ public class Game {
         }
         stapel.add(card);
         if (card.getValue() != Card.JACK) {
-            System.out.println("Reset wished color");
+            log.debug("Reset wished color");
             wishedColor = null;
         }
     }
@@ -362,8 +364,6 @@ public class Game {
             List<Card> playerCards = drawCardsFromDeck(CARDS_PER_PLAYER);
             player.addCardsToHand(playerCards);
             players.add(player);
-//            Card jackCard = new Card(Card.COLOR.KREUZ, Card.JACK);
-//            player.addCardToHand(jackCard);
         }
     }
 

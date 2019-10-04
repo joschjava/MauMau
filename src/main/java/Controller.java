@@ -1,3 +1,5 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -8,10 +10,13 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class Controller {
 
     @FXML
@@ -57,12 +62,12 @@ public class Controller {
     @FXML
     public void initialize() {
         btSubmit.setOnAction(event -> {
-            submitAction();
-            updateGui();
+            setNextPlayerButtonAction();
         });
         btPass.setOnAction(event -> {
             passAction();
             updateGui();
+            setDelayedNextPlayer();
         });
         tfInput.setOnKeyPressed(ae -> {
             if (ae.getCode().equals(KeyCode.ENTER)) {
@@ -73,10 +78,10 @@ public class Controller {
                 } else {
                     if(text.equals("")){
                         game.setNextPlayer();
+                        updateGui();
                     } else {
-                        submitAction();
+                        setNextPlayerButtonAction();
                     }
-                    updateGui();
                 }
             }
         });
@@ -98,6 +103,25 @@ public class Controller {
         game.initGame(ais);
         hbJackPickerBox.setVisible(false);
         updateGui();
+    }
+
+    private void setNextPlayerButtonAction() {
+        submitAction();
+        updateGui();
+        setDelayedNextPlayer();
+    }
+
+    public void setDelayedNextPlayer(){
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.millis(2500),
+                ae -> {
+                    game.setNextPlayer();
+                    updateGui();
+                    if(game.getCurrentPlayer().isAi()){
+                        setDelayedNextPlayer();
+                    }
+                }));
+        timeline.play();
     }
 
     public void setJackChooserButtonListener(Button button, Card.COLOR color) {
@@ -122,7 +146,6 @@ public class Controller {
             Text cardText = createColoredText(cards.get(i), i, true);
             hbDeck.getChildren().add(cardText);
         }
-
 
         for (int plId = 0; plId < players.size(); plId++) {
             Player player = players.get(plId);

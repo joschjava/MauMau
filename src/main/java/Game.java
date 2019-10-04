@@ -126,6 +126,9 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
+    }
+
+    public void triggerNextPlayerAction(){
         if (hasPlayerPlayableCards()) {
             Player currentPlayer = getCurrentPlayer();
             if (currentPlayer.isAi()) {

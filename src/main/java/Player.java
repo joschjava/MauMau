@@ -71,8 +71,9 @@ public class Player {
                 game.finishGame();
             }
         }
+        //TODO: Revise!
         if (!gameFinished) {
-//            game.setNextPlayer();
+            game.setNextPlayer();
         }
     }
 
@@ -101,6 +102,6 @@ public class Player {
         List<Card> penaltyCards = game.drawCardsFromDeck(numCardsToDraw);
         game.resetSevenMultiplier();
         addCardsToHand(penaltyCards);
-//        game.setNextPlayer();
+        game.setNextPlayer();
     }
 }

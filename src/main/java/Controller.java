@@ -115,7 +115,7 @@ public class Controller {
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.millis(2500),
                 ae -> {
-                    game.setNextPlayer();
+                    game.triggerNextPlayerAction();
                     updateGui();
                     if(game.getCurrentPlayer().isAi()){
                         setDelayedNextPlayer();

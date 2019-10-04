@@ -79,11 +79,7 @@ public class Game {
      */
     public boolean decreaseLeftPlayers() {
         leftPlayers--;
-        if (leftPlayers == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return leftPlayers == 1;
     }
 
     public int getNumPlayers() {
@@ -178,8 +174,7 @@ public class Game {
                     System.out.println("Playable card found: " + playableCard);
                 }
                 hasValidCards = true;
-                //TODO: Put back in for performance
-//                break;
+                break;
             }
         }
         return hasValidCards;

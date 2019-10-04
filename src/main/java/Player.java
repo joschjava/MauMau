@@ -25,11 +25,7 @@ public class Player {
     }
 
     public boolean isAi() {
-        if (ai == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return ai != null;
     }
 
     public void addCardsToHand(List<Card> cards) {
@@ -72,7 +68,6 @@ public class Player {
                 game.finishGame();
             }
         }
-        //TODO: Revise!
         if (!gameFinished) {
             game.setNextPlayer();
         }

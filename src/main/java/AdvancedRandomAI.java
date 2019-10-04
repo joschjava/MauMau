@@ -57,10 +57,10 @@ public class AdvancedRandomAI extends AI {
                 .filter(card -> card.getValue() != Card.JACK)
                 .collect(Collectors.groupingBy(Card::getColor,
                         Collectors.counting()));
-        Long caro = getNumber(occurrences, Card.COLOR.CARO);
-        Long pik = getNumber(occurrences, Card.COLOR.PIK);
-        Long herz = getNumber(occurrences, Card.COLOR.HERZ);
-        Long kreuz = getNumber(occurrences, Card.COLOR.KREUZ);
+        long caro = getNumber(occurrences, Card.COLOR.CARO);
+        long pik = getNumber(occurrences, Card.COLOR.PIK);
+        long herz = getNumber(occurrences, Card.COLOR.HERZ);
+        long kreuz = getNumber(occurrences, Card.COLOR.KREUZ);
         return getHighestColorFromValue(caro, pik, herz, kreuz);
     }
 

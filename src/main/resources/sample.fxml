@@ -30,6 +30,7 @@
       </children>
     </HBox>
     <HBox fx:id="hbDeck" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+    <Button fx:id="btSetNextPlayer" mnemonicParsing="false" text="Set Next Player" GridPane.columnIndex="1" GridPane.rowIndex="5" />
   </children>
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />

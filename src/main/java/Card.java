@@ -56,13 +56,27 @@ public class Card implements Comparable<Card> {
     private int value;
 
     boolean canBeLayedOn(Card card) {
+       return canBeLayedOn(card, false);
+    }
+
+    boolean canBeLayedOn(Card card, boolean debug) {
         if (value == Card.JACK || card == null) {
             return true;
         }
         if (card.getColor() != this.color && card.getValue() != this.value) {
+            if(debug) {
+                System.out.println(this + "can't be layed on" + card);
+                System.out.println("Color: " + color + ", " + card.getColor());
+                System.out.println("Value: " + value + ", " + card.getValue());
+            }
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString(){
+        return "Card["+color+"_"+valueToName(value)+"]";
     }
 
     public String toPrettyString() {
@@ -82,6 +96,12 @@ public class Card implements Comparable<Card> {
                 break;
         }
 
+        output += valueToName(value);
+        return output;
+    }
+
+    public static String valueToName(int value) {
+        String output = "";
         if (value < 11) {
             output += String.valueOf(value);
         } else {

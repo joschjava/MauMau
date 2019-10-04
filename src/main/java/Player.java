@@ -72,7 +72,7 @@ public class Player {
             }
         }
         if (!gameFinished) {
-            game.setNextPlayer();
+//            game.setNextPlayer();
         }
     }
 
@@ -92,6 +92,7 @@ public class Player {
     }
 
     public void pass() {
+        System.out.println("Player "+playerId+" is passing");
         int numCardsToDraw = 1;
         int sevenMultiplier = game.getSevenMultiplier();
         if (game.getTopStapelCard().getValue() == 7 && sevenMultiplier != 0) {
@@ -100,6 +101,6 @@ public class Player {
         List<Card> penaltyCards = game.drawCardsFromDeck(numCardsToDraw);
         game.resetSevenMultiplier();
         addCardsToHand(penaltyCards);
-        game.setNextPlayer();
+//        game.setNextPlayer();
     }
 }

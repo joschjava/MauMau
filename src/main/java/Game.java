@@ -100,6 +100,8 @@ public class Game {
         } else {
             generatePlayers(ais);
         }
+        Card card = new Card(Card.COLOR.PIK, Card.JACK);
+        deck.set(0, card);
         drawFirstStapelCard();
     }
 
@@ -112,7 +114,7 @@ public class Game {
     }
 
     public void setNextPlayer() {
-        System.out.println("Going to next player from "+getCurrentPlayerId());
+        System.out.println("Going to next player from " + getCurrentPlayerId());
         playerTurn = calculateNextPlayer();
         final Card topStapelCard = getTopStapelCard();
         if (topStapelCard == null) {
@@ -122,31 +124,43 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
-        if (!hasPlayerPlayableCards()) {
-            if(getCurrentPlayerId() == 0) {
+        if (hasPlayerPlayableCards()) {
+            Player currentPlayer = getCurrentPlayer();
+            if (currentPlayer.isAi()) {
+                AI ai = currentPlayer.getAi();
+                CardAction cardAction = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
+                if (cardAction.getCard() != null) {
+                    currentPlayer.playCard(cardAction);
+                } else {
+                    throw new RuntimeException("Player(AI) "+currentPlayer.getPlayerId()+" has no playable card but should have");
+                }
+            }
+        } else {
+            if (getCurrentPlayerId() == 0) {
+                System.out.println("Human Player has no playable cards");
+            } else {
                 System.out.println("Skipped player " + getCurrentPlayerId());
                 getCurrentPlayer().pass();
             }
         }
-        Player currentPlayer = getCurrentPlayer();
-        if (currentPlayer.isAi()) {
-            AI ai = currentPlayer.getAi();
-            CardAction cardAction = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
-            if (cardAction.getCard() != null) {
-                currentPlayer.playCard(cardAction);
-            } else {
-                currentPlayer.pass();
-            }
-        }
     }
 
-    private boolean hasPlayerPlayableCards() {
+    public boolean hasPlayerPlayableCards(){
+        return hasPlayerPlayableCards(false);
+    }
+
+    public boolean hasPlayerPlayableCards(boolean debug) {
         List<Card> handCards = getCurrentPlayer().getHandCards();
         boolean hasValidCards = false;
         for (int i = 0; i < handCards.size(); i++) {
-            if (isValidMove(handCards.get(i))) {
+            Card playableCard = handCards.get(i);
+            if (isValidMove(playableCard, debug)) {
+                if(debug) {
+                    System.out.println("Playable card found: " + playableCard);
+                }
                 hasValidCards = true;
-                break;
+                //TODO: Put back in for performance
+//                break;
             }
         }
         return hasValidCards;
@@ -179,25 +193,17 @@ public class Game {
 
     public void drawFirstStapelCard() {
         final Card firstStapelCard = drawCardFromDeck();
-        System.out.println(firstStapelCard);
         switch (firstStapelCard.getValue()) {
             case 7:
-                System.out.println("Recognized as 7");
                 increaseSevenMultiplier();
                 break;
 
             case 8:
-                System.out.println("Recognized as 8");
                 playerTurn = calculateNextPlayer();
                 break;
 
             case Card.JACK:
-                System.out.println("Recognized as Jack");
                 firstCardIsJack = true;
-                break;
-
-            default:
-                System.out.println("Recognized as other");
                 break;
         }
 
@@ -230,33 +236,43 @@ public class Game {
         boolean validMove = isValidMove(card);
         if (validMove) {
             putCardOnStapel(card);
+            firstCardIsJack = false;
         } else {
             printGameInformation();
-            throw new RuntimeException("Card " + card + " can't be layed on '" + getTopStapelCard()+ "'");
+            throw new RuntimeException("Card " + card + " can't be layed on '" + getTopStapelCard() + "'");
         }
     }
 
-    public boolean isValidMove(Card card) {
+    public boolean isValidMove(Card card){
+       return isValidMove(card, false);
+    }
+
+    public boolean isValidMove(Card card, boolean debug) {
         final Card topStapelCard = getTopStapelCard();
         boolean validCard;
         if (firstCardIsJack) {
             validCard = true;
-            //TODO: THIS MIGHT THE PROBLEM FOR ISSUE 1, this resets everything, event though only cards are being checked
-            firstCardIsJack = false;
         } else {
             if (topStapelCard.getValue() == Card.JACK) {
                 if (card.getColor() == wishedColor) {
                     validCard = true;
                 } else {
                     validCard = false;
+                    if(debug){
+                        System.out.println(card + " not playable: stapel is jack, wished color is not the same: ");
+                        System.out.println("Game.wishedColor: "+wishedColor+", Card Color: "+card.getValue());
+                    }
                 }
             } else if (topStapelCard.getValue() == 7 && sevenMultiplier != 0) {
                 if (card.getValue() == 7) {
                     validCard = true;
                 } else {
+                    if(debug) {
+                        System.out.println(card + " is not playable: Must be 7");
+                    }
                     validCard = false;
                 }
-            } else if (card.canBeLayedOn(topStapelCard)) {
+            } else if (card.canBeLayedOn(topStapelCard, debug)) {
                 validCard = true;
             } else {
                 validCard = false;
@@ -293,7 +309,8 @@ public class Game {
             eightIsPaid = false;
         }
         stapel.add(card);
-        if(card.getValue()!= Card.JACK) {
+        if (card.getValue() != Card.JACK) {
+            System.out.println("Reset wished color");
             wishedColor = null;
         }
     }
@@ -305,7 +322,7 @@ public class Game {
             stapel.removeAll(stapelCards);
             shuffleDeck();
         }
-        if(deck.size() == 0){
+        if (deck.size() == 0) {
             throw new RuntimeException("Deck shouldn't be empty");
         }
         Card drawnCard = deck.get(0);

@@ -47,6 +47,9 @@ public class Controller {
     @FXML
     HBox hbDeck;
 
+    @FXML
+    Button btSetNextPlayer;
+
     Game game;
 
     private CardAction cardAction;
@@ -63,10 +66,25 @@ public class Controller {
         });
         tfInput.setOnKeyPressed(ae -> {
             if (ae.getCode().equals(KeyCode.ENTER)) {
-                submitAction();
-                updateGui();
+                String text = tfInput.getText();
+                if(text.equals("d")){
+                    game.hasPlayerPlayableCards(true);
+                    tfInput.setText("");
+                } else {
+                    if(text.equals("")){
+                        game.setNextPlayer();
+                    } else {
+                        submitAction();
+                    }
+                    updateGui();
+                }
             }
         });
+        btSetNextPlayer.setOnAction(event -> {
+            game.setNextPlayer();
+            updateGui();
+        });
+
         setJackChooserButtonListener(btPik, Card.COLOR.PIK);
         setJackChooserButtonListener(btHerz, Card.COLOR.HERZ);
         setJackChooserButtonListener(btCaro, Card.COLOR.CARO);
@@ -176,7 +194,7 @@ public class Controller {
     }
 
     public void wishColor(Card.COLOR color) {
-        if(cardAction != null){
+        if (cardAction != null) {
             cardAction.setJackWishColor(color);
             game.getCurrentPlayer().playCard(cardAction);
         } else {

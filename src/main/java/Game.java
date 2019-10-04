@@ -89,6 +89,7 @@ public class Game {
     }
 
     public void finishGame() {
+
         gameFinished = true;
         List<Player> leftPlayer = players.stream().
                 filter(player -> player.getPlace() == -1).
@@ -128,7 +129,7 @@ public class Game {
     }
 
     public void setNextPlayer() {
-        System.out.println("Going to next player from " + getCurrentPlayerId());
+//        System.out.println("Going to next player from " + getCurrentPlayerId());
         playerTurn = calculateNextPlayer();
         final Card topStapelCard = getTopStapelCard();
         if (topStapelCard == null) {
@@ -138,7 +139,6 @@ public class Game {
             eightIsPaid = true;
             playerTurn = calculateNextPlayer();
         }
-        System.out.println("setNextPlayerDone");
     }
 
     public void triggerNextPlayerAction() {
@@ -338,7 +338,9 @@ public class Game {
             shuffleDeck();
         }
         if (deck.size() == 0) {
-            throw new RuntimeException("Deck shouldn't be empty");
+            System.out.println("No more cards available to draw");
+            return null;
+//            throw new RuntimeException("Deck shouldn't be empty");
         }
         Card drawnCard = deck.get(0);
         deck.remove(0);
@@ -348,7 +350,10 @@ public class Game {
     public List<Card> drawCardsFromDeck(int number) {
         List<Card> drawnCards = new ArrayList<>();
         for (int i = 0; i < number; i++) {
-            drawnCards.add(drawCardFromDeck());
+            Card drawnCard = drawCardFromDeck();
+            if(drawnCard != null) {
+                drawnCards.add(drawnCard);
+            }
         }
         return drawnCards;
     }

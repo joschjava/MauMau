@@ -80,7 +80,6 @@ public class Controller {
                 String text = tfInput.getText();
                 if (text.equals("d")) {
                     game.hasPlayerPlayableCards(true);
-
                 } else if (text.equals("+")) {
                     buttonPassAction();
                 } else {

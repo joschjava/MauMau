@@ -11,6 +11,8 @@ public class Game {
     private List<Card> deck = new ArrayList<>();
     private List<Card> stapel = new ArrayList<>();
     private int numPlayers;
+    private int playedRounds = 0;
+
     /**
      * If 7 is put on top of other 7s cards to draw increase
      */
@@ -56,6 +58,10 @@ public class Game {
 
     public int getLeftPlayers() {
         return leftPlayers;
+    }
+
+    public int getPlayedRounds(){
+        return playedRounds;
     }
 
     public Card.COLOR getWishedColor(){
@@ -115,8 +121,6 @@ public class Game {
         } else {
             generatePlayers(ais);
         }
-//        Card card = new Card(Card.COLOR.PIK, 8);
-//        deck.set(0, card);
         drawFirstStapelCard();
     }
 
@@ -129,6 +133,7 @@ public class Game {
     }
 
     public void setNextPlayer() {
+        playedRounds++;
 //        System.out.println("Going to next player from " + getCurrentPlayerId());
         playerTurn = calculateNextPlayer();
         final Card topStapelCard = getTopStapelCard();
@@ -220,7 +225,7 @@ public class Game {
                 firstCardIsJack = true;
                 break;
         }
-
+        System.out.println("First "+firstStapelCard);
         putCardOnStapel(firstStapelCard);
     }
 

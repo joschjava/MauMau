@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
@@ -105,8 +106,8 @@ public class Controller {
 
         game = new Game(3);
         List<AI> ais = new ArrayList<>();
+        ais.add(null);
         ais.add(new RandomAI(game));
-        ais.add(new AdvancedRandomAI(game));
         ais.add(new AdvancedRandomAI(game));
         game.initGame(ais);
         hbJackPickerBox.setVisible(false);
@@ -133,13 +134,10 @@ public class Controller {
     }
 
     public void setDelayedNextPlayerExceptGameIsFinished() {
-        System.out.println("setDelayedNextPlayerExceptGameIsFinished called");
         if (!game.isGameFinished()) {
-            System.out.println("Setting delayed next player");
             Timeline timeline = new Timeline(new KeyFrame(
                     Duration.millis(aiThinkTimeMs),
                     ae -> {
-                        System.out.println("Delayed next player action triggered");
                         game.triggerNextPlayerAction();
                         updateGui();
                         if (game.getCurrentPlayer().isAi()) {
@@ -165,7 +163,7 @@ public class Controller {
         int currentPlayerId = game.getCurrentPlayerId();
         vBplayerDisplay.getChildren().clear();
         List<Player> players = game.getPlayers();
-        updateDeckUi();
+//        updateDeckUi();
         updatePlayerUi(currentPlayerId, players);
         updateStapelCard();
         updateWishedColorUi();
@@ -175,7 +173,7 @@ public class Controller {
     private void updateWishedColorUi() {
         Card.COLOR wishedColor = game.getWishedColor();
         if (wishedColor == null) {
-            lbWishedColor.setText("");
+            lbWishedColor.setText(game.getPlayedRounds()+"");
         } else {
             Color labelColor = getColorFromCardColor(wishedColor);
             lbWishedColor.setText(Card.colorToAsciiSymbol(wishedColor));
@@ -253,6 +251,7 @@ public class Controller {
         } else {
             cardText.setFill(Color.GRAY);
         }
+        cardText.setFont(new Font(20.0));
         return cardText;
     }
 

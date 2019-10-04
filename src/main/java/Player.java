@@ -57,7 +57,7 @@ public class Player {
         if (card.getValue() == 7) {
             game.increaseSevenMultiplier();
         }
-//        System.out.println("Player "+playerId + " plays "+card);
+        System.out.println("Player "+playerId + " plays "+card);
         game.requestPutCardOnStapel(card);
         handCards.remove(card);
         if (cardAction.isJack()) {

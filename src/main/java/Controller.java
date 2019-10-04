@@ -160,11 +160,8 @@ public class Controller {
     }
 
     public void updateGui() {
-        int currentPlayerId = game.getCurrentPlayerId();
-        vBplayerDisplay.getChildren().clear();
-        List<Player> players = game.getPlayers();
 //        updateDeckUi();
-        updatePlayerUi(currentPlayerId, players);
+        updatePlayerUi();
         updateStapelCard();
         updateWishedColorUi();
         tfInput.requestFocus();
@@ -190,12 +187,16 @@ public class Controller {
         List<Card> cards = deck.subList(0, shownCards);
         hbDeck.getChildren().clear();
         for (int i = 0; i < cards.size(); i++) {
-            Text cardText = createColoredText(cards.get(i), i, true);
+            Text cardText = createColoredText(cards.get(i), i, true, false);
             hbDeck.getChildren().add(cardText);
         }
     }
 
-    private void updatePlayerUi(int currentPlayerId, List<Player> players) {
+    private void updatePlayerUi() {
+        vBplayerDisplay.getChildren().clear();
+        Player currentPlayer = game.getCurrentPlayer();
+        int currentPlayerId = currentPlayer.getPlayerId();
+        List<Player> players = game.getPlayers();
         for (int plId = 0; plId < players.size(); plId++) {
             Player player = players.get(plId);
             List<Card> handCards = player.getHandCards();
@@ -224,7 +225,10 @@ public class Controller {
                                 ));
                         validMove = game.isValidMove(card);
                     }
-                    Text cardText = createColoredText(card, i, validMove);
+
+                    boolean leadingColon = !currentPlayer.isAi() && currentPlayerId == plId;
+                    Text cardText = createColoredText(card, i, validMove, leadingColon);
+                    tFlPlayer.getChildren().add(new Button("."));
                     tFlPlayer.getChildren().add(cardText);
                 }
             } else {
@@ -243,8 +247,12 @@ public class Controller {
         lbStapel.setText(stapelCard.toPrettyString());
     }
 
-    private Text createColoredText(Card card, int i, boolean validMove) {
-        Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
+    private Text createColoredText(Card card, int i, boolean validMove, boolean hasLeadingColon) {
+        String leadingColon = "";
+        if(hasLeadingColon){
+            leadingColon = i + ": ";
+        }
+        Text cardText = new Text(leadingColon + card.toPrettyString() + "    ");
         if (validMove) {
             Color cardColor = getColorFromCardColor(card.getColor());
             cardText.setFill(cardColor);

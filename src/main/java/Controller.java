@@ -55,11 +55,17 @@ public class Controller {
     @FXML
     Button btSetNextPlayer;
 
+    @FXML
+    Label lbWishedColor;
+
     Game game;
 
     private static int aiThinkTimeMs = 1000;
 
     private CardAction cardAction;
+
+    Color caroHerzColor = Color.ORANGE;
+    Color pikKreuzColor = Color.BLACK;
 
     @FXML
     public void initialize() {
@@ -72,13 +78,13 @@ public class Controller {
         tfInput.setOnKeyPressed(ae -> {
             if (ae.getCode().equals(KeyCode.ENTER)) {
                 String text = tfInput.getText();
-                if(text.equals("d")){
+                if (text.equals("d")) {
                     game.hasPlayerPlayableCards(true);
 
-                } else if(text.equals("+")){
+                } else if (text.equals("+")) {
                     buttonPassAction();
                 } else {
-                    if(text.equals("")){
+                    if (text.equals("")) {
                         game.setNextPlayer();
                         updateGui();
                     } else {
@@ -101,12 +107,12 @@ public class Controller {
         game = new Game(3);
         List<AI> ais = new ArrayList<>();
         ais.add(new RandomAI(game));
-        ais.add(new RandomAI(game));
-        ais.add(new RandomAI(game));
+        ais.add(new AdvancedRandomAI(game));
+        ais.add(new AdvancedRandomAI(game));
         game.initGame(ais);
         hbJackPickerBox.setVisible(false);
         updateGui();
-        if(game.getCurrentPlayer().isAi()){
+        if (game.getCurrentPlayer().isAi()) {
             setDelayedNextPlayerExceptGameIsFinished();
         }
     }
@@ -122,14 +128,14 @@ public class Controller {
         System.out.println("setNextPlayerButtonAction");
         boolean jackPlayed = submitAction();
         updateGui();
-        if(!jackPlayed){
+        if (!jackPlayed) {
             setDelayedNextPlayerExceptGameIsFinished();
         }
     }
 
-    public void setDelayedNextPlayerExceptGameIsFinished(){
+    public void setDelayedNextPlayerExceptGameIsFinished() {
         System.out.println("setDelayedNextPlayerExceptGameIsFinished called");
-        if(!game.isGameFinished()) {
+        if (!game.isGameFinished()) {
             System.out.println("Setting delayed next player");
             Timeline timeline = new Timeline(new KeyFrame(
                     Duration.millis(aiThinkTimeMs),
@@ -160,6 +166,25 @@ public class Controller {
         int currentPlayerId = game.getCurrentPlayerId();
         vBplayerDisplay.getChildren().clear();
         List<Player> players = game.getPlayers();
+        updateDeckUi();
+        updatePlayerUi(currentPlayerId, players);
+        updateStapelCard();
+        updateWishedColorUi();
+        tfInput.requestFocus();
+    }
+
+    private void updateWishedColorUi() {
+        Card.COLOR wishedColor = game.getWishedColor();
+        if (wishedColor == null) {
+            lbWishedColor.setText("");
+        } else {
+            Color labelColor = getColorFromCardColor(wishedColor);
+            lbWishedColor.setText(Card.colorToAsciiSymbol(wishedColor));
+            lbWishedColor.setTextFill(labelColor);
+        }
+    }
+
+    private void updateDeckUi() {
         List<Card> deck = game.getDeck();
         int shownCards = 6;
         if (deck.size() < shownCards) {
@@ -171,19 +196,21 @@ public class Controller {
             Text cardText = createColoredText(cards.get(i), i, true);
             hbDeck.getChildren().add(cardText);
         }
+    }
 
+    private void updatePlayerUi(int currentPlayerId, List<Player> players) {
         for (int plId = 0; plId < players.size(); plId++) {
             Player player = players.get(plId);
             List<Card> handCards = player.getHandCards();
             TextFlow tFlPlayer = new TextFlow();
             String aiText = "";
-            if(player.isAi()){
-                aiText = "("+player.getAi().getAiName()+")";
-                if(player == game.getCurrentPlayer()){
+            if (player.isAi()) {
+                aiText = "(" + player.getAi().getAiName() + ")";
+                if (player == game.getCurrentPlayer()) {
                     aiText += " thinking...";
                 }
             }
-            Text playerIdText = new Text("Player " + plId + " "+aiText+" (" + handCards.size() + ")\n");
+            Text playerIdText = new Text("Player " + plId + " " + aiText + " (" + handCards.size() + ")\n");
             tFlPlayer.getChildren().add(playerIdText);
             if (!player.isPlayerFinished()) {
                 for (int i = 0; i < handCards.size(); i++) {
@@ -210,22 +237,20 @@ public class Controller {
             }
             vBplayerDisplay.getChildren().add(tFlPlayer);
         }
+    }
+
+    private void updateStapelCard() {
         Card stapelCard = game.getTopStapelCard();
-        if (stapelCard.getColor() == Card.COLOR.HERZ || stapelCard.getColor() == Card.COLOR.CARO) {
-            lbStapel.setTextFill(Color.ORANGE);
-        } else {
-            lbStapel.setTextFill(Color.BLACK);
-        }
+        Color stapelColor = getColorFromCardColor(stapelCard.getColor());
+        lbStapel.setTextFill(stapelColor);
         lbStapel.setText(stapelCard.toPrettyString());
-        tfInput.requestFocus();
     }
 
     private Text createColoredText(Card card, int i, boolean validMove) {
         Text cardText = new Text(i + ": " + card.toPrettyString() + "    ");
         if (validMove) {
-            if (card.getColor() == Card.COLOR.HERZ || card.getColor() == Card.COLOR.CARO) {
-                cardText.setFill(Color.ORANGE);
-            }
+            Color cardColor = getColorFromCardColor(card.getColor());
+            cardText.setFill(cardColor);
         } else {
             cardText.setFill(Color.GRAY);
         }
@@ -234,6 +259,7 @@ public class Controller {
 
     /**
      * Plays selected card
+     *
      * @return true if played card is jack, false otherwise
      */
     public boolean submitAction() {
@@ -262,6 +288,16 @@ public class Controller {
         }
         setDelayedNextPlayerExceptGameIsFinished();
         hbJackPickerBox.setVisible(false);
+    }
+
+    private Color getColorFromCardColor(Card.COLOR color) {
+        Color guiColor;
+        if (color == Card.COLOR.HERZ || color == Card.COLOR.CARO) {
+            guiColor = caroHerzColor;
+        } else {
+            guiColor = pikKreuzColor;
+        }
+        return guiColor;
     }
 
     public void passAction() {

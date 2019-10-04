@@ -7,7 +7,7 @@ import java.util.List;
 abstract class AI {
 
     Game game;
-    String aiName;
+    String aiName = "Unnamed AI";
 
     AI(Game game){
         this.game = game;
@@ -24,7 +24,7 @@ abstract class AI {
         return possibleCards;
     }
 
-    abstract CardAction makeMove(List<Card> handCards, Card stapelCard);
+    abstract CardAction makeMove(List<Card> handCards);
 
     public String getAiName(){
         return aiName;

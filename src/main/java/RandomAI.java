@@ -8,7 +8,7 @@ public class RandomAI extends AI {
     }
 
     @Override
-    CardAction makeMove(List<Card> handCards, Card stapelCard) {
+    CardAction makeMove(List<Card> handCards) {
         List<Card> possiblePlayableCards = super.getPossiblePlayableCards(handCards);
 
         int size = possiblePlayableCards.size();

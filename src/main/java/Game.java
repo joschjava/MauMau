@@ -58,6 +58,10 @@ public class Game {
         return leftPlayers;
     }
 
+    public Card.COLOR getWishedColor(){
+        return wishedColor;
+    }
+
     public List<Card> getDeck() {
         return deck;
     }
@@ -142,7 +146,7 @@ public class Game {
             Player currentPlayer = getCurrentPlayer();
             if (currentPlayer.isAi()) {
                 AI ai = currentPlayer.getAi();
-                CardAction cardAction = ai.makeMove(currentPlayer.getHandCards(), getTopStapelCard());
+                CardAction cardAction = ai.makeMove(currentPlayer.getHandCards());
                 if (cardAction.getCard() != null) {
                     currentPlayer.playCard(cardAction);
                 } else {

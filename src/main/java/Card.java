@@ -80,6 +80,12 @@ public class Card implements Comparable<Card> {
     }
 
     public String toPrettyString() {
+        String output = colorToAsciiSymbol(color);
+        output += valueToName(value);
+        return output;
+    }
+
+    public static String colorToAsciiSymbol(COLOR color) {
         String output = "";
         switch (color) {
             case PIK:
@@ -95,8 +101,6 @@ public class Card implements Comparable<Card> {
                 output += "\u2663";
                 break;
         }
-
-        output += valueToName(value);
         return output;
     }
 

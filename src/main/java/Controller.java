@@ -4,13 +4,10 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,13 +18,7 @@ import java.util.List;
 public class Controller {
 
     @FXML
-    Button btSubmit;
-
-    @FXML
     VBox vBplayerDisplay;
-
-    @FXML
-    TextField tfInput;
 
     @FXML
     Label lbStapel;
@@ -54,9 +45,6 @@ public class Controller {
     HBox hbDeck;
 
     @FXML
-    Button btSetNextPlayer;
-
-    @FXML
     Label lbWishedColor;
 
     Game game;
@@ -70,34 +58,34 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        btSubmit.setOnAction(event -> {
-            setNextPlayerButtonAction();
-        });
+//        btSubmit.setOnAction(event -> {
+//            setNextPlayerButtonAction();
+//        });
         btPass.setOnAction(event -> {
             buttonPassAction();
         });
-        tfInput.setOnKeyPressed(ae -> {
-            if (ae.getCode().equals(KeyCode.ENTER)) {
-                String text = tfInput.getText();
-                if (text.equals("d")) {
-                    game.hasPlayerPlayableCards(true);
-                } else if (text.equals("+")) {
-                    buttonPassAction();
-                } else {
-                    if (text.equals("")) {
-                        game.setNextPlayer();
-                        updateGui();
-                    } else {
-                        setNextPlayerButtonAction();
-                    }
-                }
-                tfInput.setText("");
-            }
-        });
-        btSetNextPlayer.setOnAction(event -> {
-            game.setNextPlayer();
-            updateGui();
-        });
+//        tfInput.setOnKeyPressed(ae -> {
+//            if (ae.getCode().equals(KeyCode.ENTER)) {
+//                String text = tfInput.getText();
+//                if (text.equals("d")) {
+//                    game.hasPlayerPlayableCards(true);
+//                } else if (text.equals("+")) {
+//                    buttonPassAction();
+//                } else {
+//                    if (text.equals("")) {
+//                        game.setNextPlayer();
+//                        updateGui();
+//                    } else {
+////                        setNextPlayerButtonAction();
+//                    }
+//                }
+//                tfInput.setText("");
+//            }
+//        });
+//        btSetNextPlayer.setOnAction(event -> {
+//            game.setNextPlayer();
+//            updateGui();
+//        });
 
         setJackChooserButtonListener(btPik, Card.COLOR.PIK);
         setJackChooserButtonListener(btHerz, Card.COLOR.HERZ);
@@ -124,9 +112,8 @@ public class Controller {
         setDelayedNextPlayerExceptGameIsFinished();
     }
 
-    private void setNextPlayerButtonAction() {
-        System.out.println("setNextPlayerButtonAction");
-        boolean jackPlayed = submitAction();
+    private void setNextPlayerButtonAction(int cardId) {
+        boolean jackPlayed = submitAction(cardId);
         updateGui();
         if (!jackPlayed) {
             setDelayedNextPlayerExceptGameIsFinished();
@@ -134,18 +121,23 @@ public class Controller {
     }
 
     public void setDelayedNextPlayerExceptGameIsFinished() {
+        btPass.setDisable(true);
         if (!game.isGameFinished()) {
             Timeline timeline = new Timeline(new KeyFrame(
                     Duration.millis(aiThinkTimeMs),
                     ae -> {
                         game.triggerNextPlayerAction();
                         updateGui();
-                        if (game.getCurrentPlayer().isAi()) {
+                        Player currentPlayer = game.getCurrentPlayer();
+                        if (currentPlayer.isAi()) {
                             setDelayedNextPlayerExceptGameIsFinished();
-                        } else {
+                        } else if(!game.hasPlayerPlayableCards()) {
+                            setDelayedNextPlayerExceptGameIsFinished();
+                        } else
+                            btPass.setDisable(false);
                             System.out.println("Next player not ai");
                         }
-                    }));
+                    ));
             timeline.play();
         } else {
             System.out.println("Game is finished");
@@ -164,7 +156,7 @@ public class Controller {
         updatePlayerUi();
         updateStapelCard();
         updateWishedColorUi();
-        tfInput.requestFocus();
+//        tfInput.requestFocus();
     }
 
     private void updateWishedColorUi() {
@@ -187,7 +179,7 @@ public class Controller {
         List<Card> cards = deck.subList(0, shownCards);
         hbDeck.getChildren().clear();
         for (int i = 0; i < cards.size(); i++) {
-            Text cardText = createColoredText(cards.get(i), i, true, false);
+            Text cardText = createColoredText(cards.get(i), true);
             hbDeck.getChildren().add(cardText);
         }
     }
@@ -200,7 +192,7 @@ public class Controller {
         for (int plId = 0; plId < players.size(); plId++) {
             Player player = players.get(plId);
             List<Card> handCards = player.getHandCards();
-            TextFlow tFlPlayer = new TextFlow();
+            HBox hBPlayer = new HBox();
             String aiText = "";
             if (player.isAi()) {
                 aiText = "(" + player.getAi().getAiName() + ")";
@@ -209,14 +201,14 @@ public class Controller {
                 }
             }
             Text playerIdText = new Text("Player " + plId + " " + aiText + " (" + handCards.size() + ")\n");
-            tFlPlayer.getChildren().add(playerIdText);
+            vBplayerDisplay.getChildren().add(playerIdText);
             if (!player.isPlayerFinished()) {
                 for (int i = 0; i < handCards.size(); i++) {
                     Card card = handCards.get(i);
                     boolean validMove = true;
                     if (plId == currentPlayerId) {
                         String colorString = "#9281ED";
-                        tFlPlayer.setBackground(
+                        hBPlayer.setBackground(
                                 new Background(
                                         new BackgroundFill(
                                                 Color.web(colorString),
@@ -226,17 +218,25 @@ public class Controller {
                         validMove = game.isValidMove(card);
                     }
 
-                    boolean leadingColon = !currentPlayer.isAi() && currentPlayerId == plId;
-                    Text cardText = createColoredText(card, i, validMove, leadingColon);
-                    tFlPlayer.getChildren().add(new Button("."));
-                    tFlPlayer.getChildren().add(cardText);
+                    boolean leadingColon = !player.isAi();
+                    if(leadingColon){
+                        if(currentPlayerId != plId){
+                            validMove = false;
+                        }
+                        Button cardButton = createColoredButton(card, i, validMove);
+                        hBPlayer.getChildren().add(cardButton);
+                    } else {
+                        Text cardText = createColoredText(card, validMove);
+                        hBPlayer.getChildren().add(cardText);
+                    }
+                    hBPlayer.setSpacing(20);
                 }
             } else {
                 int place = player.getPlace();
                 Text placeText = new Text(place + ". place");
-                tFlPlayer.getChildren().add(placeText);
+                hBPlayer.getChildren().add(placeText);
             }
-            vBplayerDisplay.getChildren().add(tFlPlayer);
+            vBplayerDisplay.getChildren().add(hBPlayer);
         }
     }
 
@@ -247,12 +247,30 @@ public class Controller {
         lbStapel.setText(stapelCard.toPrettyString());
     }
 
-    private Text createColoredText(Card card, int i, boolean validMove, boolean hasLeadingColon) {
-        String leadingColon = "";
-        if(hasLeadingColon){
-            leadingColon = i + ": ";
+    private Button createColoredButton(Card card, int i, boolean validMove) {
+        Button cardButton = new Button(card.toPrettyString());
+
+        if (validMove) {
+            Color cardColor = getColorFromCardColor(card.getColor());
+            String hexString = Util.getHexRepresentation(cardColor);
+            cardButton.setStyle("-fx-text-fill: "+hexString);
+            cardButton.setDisable(false);
+        } else {
+            Color gray = Color.GRAY;
+            String hexString = Util.getHexRepresentation(gray);
+            cardButton.setStyle("-fx-text-fill: "+hexString);
+            cardButton.setDisable(true);
         }
-        Text cardText = new Text(leadingColon + card.toPrettyString() + "    ");
+        cardButton.setFont(new Font(20.0));
+        cardButton.setOnAction(
+                ae -> setNextPlayerButtonAction(i)
+        );
+        cardButton.setPadding(new Insets(2));
+        return cardButton;
+    }
+
+    private Text createColoredText(Card card, boolean validMove) {
+        Text cardText = new Text(card.toPrettyString());
         if (validMove) {
             Color cardColor = getColorFromCardColor(card.getColor());
             cardText.setFill(cardColor);
@@ -267,11 +285,9 @@ public class Controller {
      * Plays selected card
      *
      * @return true if played card is jack, false otherwise
+     * @param cardId
      */
-    public boolean submitAction() {
-        String text = tfInput.getText();
-        tfInput.setText("");
-        int cardId = Integer.valueOf(text);
+    public boolean submitAction(int cardId) {
         Player currentPlayer = game.getCurrentPlayer();
         Card card = currentPlayer.getCardFromId(cardId);
         cardAction = new CardAction(card);

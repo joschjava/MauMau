@@ -1,3 +1,5 @@
+import javafx.scene.paint.Color;
+
 import java.util.Random;
 
 public class Util {
@@ -28,6 +30,13 @@ public class Util {
     public static int getRandomNumberInRange(int max) {
         Random r = new Random();
         return r.nextInt((max + 1));
+    }
+
+    public static String getHexRepresentation(Color color){
+        int r = (int) (color.getRed()*255);
+        int g = (int) (color.getGreen()*255);
+        int b = (int) (color.getBlue()*255);
+        return String.format("#%02x%02x%02x", r, g, b);
     }
 
 }

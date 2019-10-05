@@ -57,10 +57,10 @@ public class AdvancedRandomAI extends AI {
                 .filter(card -> card.getValue() != Card.JACK)
                 .collect(Collectors.groupingBy(Card::getColor,
                         Collectors.counting()));
-        long caro = getNumber(occurrences, Card.COLOR.CARO);
-        long pik = getNumber(occurrences, Card.COLOR.PIK);
-        long herz = getNumber(occurrences, Card.COLOR.HERZ);
-        long kreuz = getNumber(occurrences, Card.COLOR.KREUZ);
+        long caro = getNumber(occurrences, Card.COLOR.DIAMONDS);
+        long pik = getNumber(occurrences, Card.COLOR.SPADES);
+        long herz = getNumber(occurrences, Card.COLOR.HEARTS);
+        long kreuz = getNumber(occurrences, Card.COLOR.CLUBS);
         return getHighestColorFromValue(caro, pik, herz, kreuz);
     }
 
@@ -77,19 +77,19 @@ public class AdvancedRandomAI extends AI {
         long highestNumber = -1;
         Card.COLOR highestColor = null;
         if (caro > highestNumber) {
-            highestColor = Card.COLOR.CARO;
+            highestColor = Card.COLOR.DIAMONDS;
             highestNumber = caro;
         }
         if (pik > highestNumber) {
-            highestColor = Card.COLOR.PIK;
+            highestColor = Card.COLOR.SPADES;
             highestNumber = pik;
         }
         if (herz > highestNumber) {
-            highestColor = Card.COLOR.HERZ;
+            highestColor = Card.COLOR.HEARTS;
             highestNumber = herz;
         }
         if (kreuz > highestNumber) {
-            highestColor = Card.COLOR.KREUZ;
+            highestColor = Card.COLOR.CLUBS;
         }
         return highestColor;
     }

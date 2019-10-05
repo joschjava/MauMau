@@ -10,21 +10,21 @@
 //
 //    @Test(expected = RuntimeException.class)
 //    public void invalidValueTest() {
-//        new Card(Card.COLOR.CARO, 3);
+//        new Card(Card.COLOR.DIAMONDS, 3);
 //    }
 //
 //    @Test(expected = RuntimeException.class)
 //    public void invalidValueTest2() {
-//        new Card(Card.COLOR.CARO, 15);
+//        new Card(Card.COLOR.DIAMONDS, 15);
 //    }
 //
 //    @Test
 //    public void canBeLayedOnTest() {
-//        Card pikBube = new Card(Card.COLOR.PIK, Card.JACK);
-//        Card pik7 = new Card(Card.COLOR.PIK, 7);
-//        Card pikQueen = new Card(Card.COLOR.PIK, Card.QUEEN);
-//        Card caroJack = new Card(Card.COLOR.CARO, Card.JACK);
-//        Card any = new Card(Card.COLOR.CARO, 7);
+//        Card pikBube = new Card(Card.COLOR.SPADES, Card.JACK);
+//        Card pik7 = new Card(Card.COLOR.SPADES, 7);
+//        Card pikQueen = new Card(Card.COLOR.SPADES, Card.QUEEN);
+//        Card caroJack = new Card(Card.COLOR.DIAMONDS, Card.JACK);
+//        Card any = new Card(Card.COLOR.DIAMONDS, 7);
 //
 //        assertTrue(pikBube.canBeLayedOn(any));
 //        assertTrue(pik7.canBeLayedOn(pikBube));
@@ -51,7 +51,7 @@
 //    public void nextPlayerTest() {
 //        final Game game = new Game(3);
 //        game.initGame();
-//        Card neutralCard = new Card(Card.COLOR.KREUZ, 10);
+//        Card neutralCard = new Card(Card.COLOR.CLUBS, 10);
 //        game.putCardOnStapel(neutralCard);
 //        game.setNextPlayer();
 //
@@ -61,7 +61,7 @@
 //            System.err.println(game.getTopStapelCard());
 //            throw ae;
 //        }
-//        Card pik8 = new Card(Card.COLOR.PIK, 8);
+//        Card pik8 = new Card(Card.COLOR.SPADES, 8);
 //        game.putCardOnStapel(pik8);
 //        game.setNextPlayer();
 //        assertEquals(0, game.getCurrentPlayerId());
@@ -71,8 +71,8 @@
 //    public void jackOnStapelNextCardIsAsWished() {
 //        Game game = new Game(3);
 //        prepareJackTest(game);
-//        game.setWishedColor(Card.COLOR.KREUZ);
-//        Card card = new Card(Card.COLOR.KREUZ, 9);
+//        game.setWishedColor(Card.COLOR.CLUBS);
+//        Card card = new Card(Card.COLOR.CLUBS, 9);
 //        game.requestPutCardOnStapel(card);
 //    }
 //
@@ -80,9 +80,9 @@
 //    public void jackOnStapelNextCardIsAsWishedAndSameColorAsJack() {
 //        Game game = new Game(3);
 //        prepareJackTest(game);
-//        game.setWishedColor(Card.COLOR.PIK);
+//        game.setWishedColor(Card.COLOR.SPADES);
 //
-//        Card card = new Card(Card.COLOR.PIK, 9);
+//        Card card = new Card(Card.COLOR.SPADES, 9);
 //        game.requestPutCardOnStapel(card);
 //    }
 //
@@ -90,21 +90,21 @@
 //    public void jackHerzLayingHerz8() {
 //        Game game = new Game(3);
 //        game.initGame();
-//        Card neutralCard = new Card(Card.COLOR.KREUZ, 10);
+//        Card neutralCard = new Card(Card.COLOR.CLUBS, 10);
 //        game.putCardOnStapel(neutralCard);
-//        Card card = new Card(Card.COLOR.HERZ, Card.JACK);
+//        Card card = new Card(Card.COLOR.HEARTS, Card.JACK);
 //        Player currentPlayer = game.getCurrentPlayer();
 //        currentPlayer.addCardToHand(card);
 //        currentPlayer.playCard(card);
-//        game.setWishedColor(Card.COLOR.HERZ);
-//        Card herz8 = new Card(Card.COLOR.HERZ, 8);
+//        game.setWishedColor(Card.COLOR.HEARTS);
+//        Card herz8 = new Card(Card.COLOR.HEARTS, 8);
 //        game.requestPutCardOnStapel(herz8);
 //    }
 //
 //    private void prepareJackTest(Game game) {
 //        game.initGame();
-//        Card card = new Card(Card.COLOR.PIK, Card.JACK);
-//        Card neutralCard = new Card(Card.COLOR.PIK, 10);
+//        Card card = new Card(Card.COLOR.SPADES, Card.JACK);
+//        Card neutralCard = new Card(Card.COLOR.SPADES, 10);
 //        game.putCardOnStapel(neutralCard);
 //        Player currentPlayer = game.getCurrentPlayer();
 //        currentPlayer.addCardToHand(card);
@@ -115,8 +115,8 @@
 //    public void jackOnStapelNextCardIsNotAsWished() {
 //        Game game = new Game(3);
 //        prepareJackTest(game);
-//        game.setWishedColor(Card.COLOR.KREUZ);
-//        Card card = new Card(Card.COLOR.PIK, 9);
+//        game.setWishedColor(Card.COLOR.CLUBS);
+//        Card card = new Card(Card.COLOR.SPADES, 9);
 //        game.requestPutCardOnStapel(card);
 //    }
 //
@@ -124,10 +124,10 @@
 //    public void sevenMultiplierTripleTest() {
 //        Game game = new Game(2);
 //        game.initGame();
-//        Card kreuz10 = new Card(Card.COLOR.KREUZ, 10);
-//        Card kreuz7 = new Card(Card.COLOR.KREUZ, 7);
-//        Card pik7 = new Card(Card.COLOR.PIK, 7);
-//        Card herz7 = new Card(Card.COLOR.HERZ, 7);
+//        Card kreuz10 = new Card(Card.COLOR.CLUBS, 10);
+//        Card kreuz7 = new Card(Card.COLOR.CLUBS, 7);
+//        Card pik7 = new Card(Card.COLOR.SPADES, 7);
+//        Card herz7 = new Card(Card.COLOR.HEARTS, 7);
 //        game.putCardOnStapel(kreuz10);
 //        List<Player> players = game.getPlayers();
 //        Player player0 = players.get(0);
@@ -159,8 +159,8 @@
 //    public void sevenMultiplierSingleTest() {
 //        Game game = new Game(2);
 //        game.initGame();
-//        Card kreuz10 = new Card(Card.COLOR.KREUZ, 10);
-//        Card kreuz7 = new Card(Card.COLOR.KREUZ, 7);
+//        Card kreuz10 = new Card(Card.COLOR.CLUBS, 10);
+//        Card kreuz7 = new Card(Card.COLOR.CLUBS, 7);
 //        game.putCardOnStapel(kreuz10);
 //        List<Player> players = game.getPlayers();
 //        Player player0 = players.get(0);
@@ -176,17 +176,17 @@
 //    @Test
 //    public void playerPassedBecauseHeHasNoOptionsTest() {
 //        Game game = createGameWithNoPlayerHavingCards();
-//        Card pik10 = new Card(Card.COLOR.PIK, 10);
+//        Card pik10 = new Card(Card.COLOR.SPADES, 10);
 //        game.putCardOnStapel(pik10);
 //        List<Player> players = game.getPlayers();
 //        Player player0 = players.get(0);
 //        Player player1 = players.get(1);
 //        Player player2 = players.get(2);
 //
-//        Card pik9 = new Card(Card.COLOR.PIK, 9);
-//        Card kreuz9 = new Card(Card.COLOR.KREUZ, 9);
-//        Card herz10 = new Card(Card.COLOR.HERZ, 10);
-//        Card pikAce = new Card(Card.COLOR.PIK, Card.ACE);
+//        Card pik9 = new Card(Card.COLOR.SPADES, 9);
+//        Card kreuz9 = new Card(Card.COLOR.CLUBS, 9);
+//        Card herz10 = new Card(Card.COLOR.HEARTS, 10);
+//        Card pikAce = new Card(Card.COLOR.SPADES, Card.ACE);
 //
 //        //Hands
 //        player0.addCardToHand(pik9);
@@ -210,11 +210,11 @@
 //        Player player1 = players.get(1);
 //        Player player2 = players.get(2);
 //
-//        Card herz9 = new Card(Card.COLOR.HERZ, 9);
-//        Card herz10 = new Card(Card.COLOR.HERZ, 10);
-//        Card herzKing = new Card(Card.COLOR.HERZ, Card.KING);
-//        Card herzQueen = new Card(Card.COLOR.HERZ, Card.QUEEN);
-//        Card herzAce = new Card(Card.COLOR.HERZ, Card.ACE);
+//        Card herz9 = new Card(Card.COLOR.HEARTS, 9);
+//        Card herz10 = new Card(Card.COLOR.HEARTS, 10);
+//        Card herzKing = new Card(Card.COLOR.HEARTS, Card.KING);
+//        Card herzQueen = new Card(Card.COLOR.HEARTS, Card.QUEEN);
+//        Card herzAce = new Card(Card.COLOR.HEARTS, Card.ACE);
 //
 //        game.putCardOnStapel(herzAce);
 //        player0.addCardToHand(herz9);
@@ -254,7 +254,7 @@
 //        Game game = new Game(3);
 //        game.initGame();
 //        List<Card> deck = game.getDeck();
-//        Card pikSeven = new Card(Card.COLOR.PIK, 7);
+//        Card pikSeven = new Card(Card.COLOR.SPADES, 7);
 //        deck.set(0, pikSeven);
 //        game.resetSevenMultiplier();
 //        game.drawFirstStapelCard();
@@ -270,8 +270,8 @@
 //        Game game = new Game(3);
 //        game.initGame();
 //        List<Card> deck = game.getDeck();
-//        Card pikSeven = new Card(Card.COLOR.PIK, 7);
-//        Card caroSeven = new Card(Card.COLOR.CARO, 7);
+//        Card pikSeven = new Card(Card.COLOR.SPADES, 7);
+//        Card caroSeven = new Card(Card.COLOR.DIAMONDS, 7);
 //        deck.set(0, pikSeven);
 //        game.resetSevenMultiplier();
 //        game.drawFirstStapelCard();
@@ -290,8 +290,8 @@
 //        Game game = new Game(3);
 //        game.initGame();
 //        List<Card> deck = game.getDeck();
-//        Card pikJack = new Card(Card.COLOR.PIK, Card.JACK);
-//        Card caroSeven = new Card(Card.COLOR.CARO, 7);
+//        Card pikJack = new Card(Card.COLOR.SPADES, Card.JACK);
+//        Card caroSeven = new Card(Card.COLOR.DIAMONDS, 7);
 //        deck.set(0, pikJack);
 //        game.resetSevenMultiplier();
 //        game.drawFirstStapelCard();
@@ -305,7 +305,7 @@
 //        Game game = new Game(3);
 //        game.initGame();
 //        List<Card> deck = game.getDeck();
-//        Card caro8 = new Card(Card.COLOR.CARO, 8);
+//        Card caro8 = new Card(Card.COLOR.DIAMONDS, 8);
 //        int nextPlayerBefore = game.getCurrentPlayerId();
 //        deck.set(0, caro8);
 //        game.resetSevenMultiplier();

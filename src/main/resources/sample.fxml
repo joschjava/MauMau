@@ -5,13 +5,33 @@
 <?import javafx.geometry.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
 
 <GridPane alignment="CENTER" hgap="50.0" vgap="50.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="Controller">
   <children>
-    <VBox fx:id="vBplayerDisplay" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+    <VBox fx:id="vBplayerDisplay" GridPane.columnIndex="0" GridPane.rowIndex="1">
+      <children>
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+          <effect>
+            <Lighting diffuseConstant="1.3174603174603174" specularConstant="0.7920634920634921" specularExponent="16.507936507936506" surfaceScale="0.0">
+              <bumpInput>
+                <Shadow />
+              </bumpInput>
+              <light>
+                <javafx.scene.effect.Light.Distant color="#b4f6ff" />
+              </light>
+            </Lighting>
+          </effect>
+          <image>
+            <Image url="@cards/classic/small/c10.png" />
+          </image>
+        </ImageView>
+      </children>
+    </VBox>
     <Label fx:id="lbStapel" text="Stapel" GridPane.columnIndex="1" GridPane.rowIndex="1">
       <font>
         <Font size="30.0" fx:id="x2" />

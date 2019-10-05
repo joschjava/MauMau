@@ -29,23 +29,23 @@ public class Card implements Comparable<Card> {
     private int colorToValue(COLOR color) {
         int value = -1;
         switch (color) {
-            case CARO:
+            case DIAMONDS:
                 value = 1;
                 break;
-            case HERZ:
+            case HEARTS:
                 value = 2;
                 break;
-            case PIK:
+            case SPADES:
                 value = 3;
                 break;
-            case KREUZ:
+            case CLUBS:
                 value = 4;
                 break;
         }
         return value;
     }
 
-    public enum COLOR {PIK, CARO, HERZ, KREUZ}
+    public enum COLOR {SPADES, DIAMONDS, HEARTS, CLUBS}
 
     public final static int JACK = 11;
     public final static int QUEEN = 12;
@@ -88,16 +88,16 @@ public class Card implements Comparable<Card> {
     public static String colorToAsciiSymbol(COLOR color) {
         String output = "";
         switch (color) {
-            case PIK:
+            case SPADES:
                 output += "\u2660";
                 break;
-            case CARO:
+            case DIAMONDS:
                 output += "\u2666";
                 break;
-            case HERZ:
+            case HEARTS:
                 output += "\u2665";
                 break;
-            case KREUZ:
+            case CLUBS:
                 output += "\u2663";
                 break;
         }

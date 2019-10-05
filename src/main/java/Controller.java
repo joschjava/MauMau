@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -58,51 +60,29 @@ public class Controller {
 
     @FXML
     public void initialize() {
-//        btSubmit.setOnAction(event -> {
-//            setNextPlayerButtonAction();
-//        });
-        btPass.setOnAction(event -> {
-            buttonPassAction();
-        });
-//        tfInput.setOnKeyPressed(ae -> {
-//            if (ae.getCode().equals(KeyCode.ENTER)) {
-//                String text = tfInput.getText();
-//                if (text.equals("d")) {
-//                    game.hasPlayerPlayableCards(true);
-//                } else if (text.equals("+")) {
-//                    buttonPassAction();
-//                } else {
-//                    if (text.equals("")) {
-//                        game.setNextPlayer();
-//                        updateGui();
-//                    } else {
-////                        setNextPlayerButtonAction();
-//                    }
-//                }
-//                tfInput.setText("");
-//            }
-//        });
-//        btSetNextPlayer.setOnAction(event -> {
-//            game.setNextPlayer();
-//            updateGui();
-//        });
+        Card card = new Card(Card.COLOR.CLUBS, Card.ACE);
+        GuiCard guiCard = new GuiCard(card);
+        ImageView imageView = guiCard.getImageView();
+        vBplayerDisplay.getChildren().add(imageView);
 
-        setJackChooserButtonListener(btPik, Card.COLOR.PIK);
-        setJackChooserButtonListener(btHerz, Card.COLOR.HERZ);
-        setJackChooserButtonListener(btCaro, Card.COLOR.CARO);
-        setJackChooserButtonListener(btKreuz, Card.COLOR.KREUZ);
-
-        game = new Game(3);
-        List<AI> ais = new ArrayList<>();
-        ais.add(null);
-        ais.add(new RandomAI(game));
-        ais.add(new AdvancedRandomAI(game));
-        game.initGame(ais);
-        hbJackPickerBox.setVisible(false);
-        updateGui();
-        if (game.getCurrentPlayer().isAi()) {
-            setDelayedNextPlayerExceptGameIsFinished();
-        }
+//        btPass.setOnAction(event -> buttonPassAction());
+//
+//        setJackChooserButtonListener(btPik, Card.COLOR.SPADES);
+//        setJackChooserButtonListener(btHerz, Card.COLOR.HEARTS);
+//        setJackChooserButtonListener(btCaro, Card.COLOR.DIAMONDS);
+//        setJackChooserButtonListener(btKreuz, Card.COLOR.CLUBS);
+//
+//        game = new Game(3);
+//        List<AI> ais = new ArrayList<>();
+//        ais.add(null);
+//        ais.add(new RandomAI(game));
+//        ais.add(new AdvancedRandomAI(game));
+//        game.initGame(ais);
+//        hbJackPickerBox.setVisible(false);
+//        updateGui();
+//        if (game.getCurrentPlayer().isAi()) {
+//            setDelayedNextPlayerExceptGameIsFinished();
+//        }
     }
 
     private void buttonPassAction() {
@@ -314,7 +294,7 @@ public class Controller {
 
     private Color getColorFromCardColor(Card.COLOR color) {
         Color guiColor;
-        if (color == Card.COLOR.HERZ || color == Card.COLOR.CARO) {
+        if (color == Card.COLOR.HEARTS || color == Card.COLOR.DIAMONDS) {
             guiColor = caroHerzColor;
         } else {
             guiColor = pikKreuzColor;

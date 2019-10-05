@@ -230,10 +230,10 @@ public class Game {
 
     private void generateAllCards() {
         for (int i = 7; i <= 14; i++) {
-            Card herz = new Card(Card.COLOR.HERZ, i);
-            Card pik = new Card(Card.COLOR.PIK, i);
-            Card kreuz = new Card(Card.COLOR.KREUZ, i);
-            Card caro = new Card(Card.COLOR.CARO, i);
+            Card herz = new Card(Card.COLOR.HEARTS, i);
+            Card pik = new Card(Card.COLOR.SPADES, i);
+            Card kreuz = new Card(Card.COLOR.CLUBS, i);
+            Card caro = new Card(Card.COLOR.DIAMONDS, i);
             deck.add(herz);
             deck.add(pik);
             deck.add(kreuz);

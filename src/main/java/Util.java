@@ -1,27 +1,31 @@
 import javafx.scene.paint.Color;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.Random;
 
 public class Util {
 
     public static Card.COLOR getRandomColor() {
         int randomInt = getRandomNumberInRange(3);
-        Card.COLOR color = Card.COLOR.PIK;
+        Card.COLOR color = Card.COLOR.SPADES;
         switch (randomInt) {
             case 0:
-                color = Card.COLOR.PIK;
+                color = Card.COLOR.SPADES;
                 break;
 
             case 1:
-                color = Card.COLOR.HERZ;
+                color = Card.COLOR.HEARTS;
                 break;
 
             case 2:
-                color = Card.COLOR.KREUZ;
+                color = Card.COLOR.CLUBS;
                 break;
 
             case 3:
-                color = Card.COLOR.CARO;
+                color = Card.COLOR.DIAMONDS;
                 break;
         }
         return color;
@@ -37,6 +41,19 @@ public class Util {
         int g = (int) (color.getGreen()*255);
         int b = (int) (color.getBlue()*255);
         return String.format("#%02x%02x%02x", r, g, b);
+    }
+
+
+    // get file from classpath, resources folder
+    public static FileInputStream getFileInputStreamFromResources(Class clazz, String fileName) {
+        ClassLoader classLoader = clazz.getClassLoader();
+        URL resource = classLoader.getResource(fileName);
+        try {
+            return new FileInputStream(resource.getPath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

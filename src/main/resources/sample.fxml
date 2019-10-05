@@ -32,11 +32,6 @@
         </ImageView>
       </children>
     </VBox>
-    <Label fx:id="lbStapel" text="Stapel" GridPane.columnIndex="1" GridPane.rowIndex="1">
-      <font>
-        <Font size="30.0" fx:id="x2" />
-      </font>
-    </Label>
     <HBox fx:id="hbJackPickerBox" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="5">
       <children>
         <Button fx:id="btCaro" mnemonicParsing="false" text="♦">
@@ -50,8 +45,13 @@
       </children>
     </HBox>
     <HBox fx:id="hbDeck" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-    <Label fx:id="lbWishedColor" font="$x2" text="WishedColor" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+    <Label fx:id="lbWishedColor" text="WishedColor" GridPane.columnIndex="2" GridPane.rowIndex="1">
+      <font>
+        <Font size="30.0" fx:id="x2" />
+      </font>
+    </Label>
     <Button id="passButton" fx:id="btPass" mnemonicParsing="false" text="Pass" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    <HBox id="HBox" fx:id="hbStapel" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
   </children>
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />

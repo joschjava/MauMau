@@ -23,7 +23,7 @@ public class Controller {
     VBox vBplayerDisplay;
 
     @FXML
-    Label lbStapel;
+    HBox hbStapel;
 
     @FXML
     Button btPass;
@@ -60,29 +60,29 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        Card card = new Card(Card.COLOR.CLUBS, Card.ACE);
-        GuiCard guiCard = new GuiCard(card);
-        ImageView imageView = guiCard.getImageView();
-        vBplayerDisplay.getChildren().add(imageView);
+//        Card card = new Card(Card.COLOR.CLUBS, Card.ACE);
+//        GuiCard guiCard = new GuiCard(card);
+//        ImageView imageView = guiCard.getImageView();
+//        vBplayerDisplay.getChildren().add(imageView);
 
-//        btPass.setOnAction(event -> buttonPassAction());
-//
-//        setJackChooserButtonListener(btPik, Card.COLOR.SPADES);
-//        setJackChooserButtonListener(btHerz, Card.COLOR.HEARTS);
-//        setJackChooserButtonListener(btCaro, Card.COLOR.DIAMONDS);
-//        setJackChooserButtonListener(btKreuz, Card.COLOR.CLUBS);
-//
-//        game = new Game(3);
-//        List<AI> ais = new ArrayList<>();
-//        ais.add(null);
-//        ais.add(new RandomAI(game));
-//        ais.add(new AdvancedRandomAI(game));
-//        game.initGame(ais);
-//        hbJackPickerBox.setVisible(false);
-//        updateGui();
-//        if (game.getCurrentPlayer().isAi()) {
-//            setDelayedNextPlayerExceptGameIsFinished();
-//        }
+        btPass.setOnAction(event -> buttonPassAction());
+
+        setJackChooserButtonListener(btPik, Card.COLOR.SPADES);
+        setJackChooserButtonListener(btHerz, Card.COLOR.HEARTS);
+        setJackChooserButtonListener(btCaro, Card.COLOR.DIAMONDS);
+        setJackChooserButtonListener(btKreuz, Card.COLOR.CLUBS);
+
+        game = new Game(3);
+        List<AI> ais = new ArrayList<>();
+        ais.add(null);
+        ais.add(new RandomAI(game));
+        ais.add(new AdvancedRandomAI(game));
+        game.initGame(ais);
+        hbJackPickerBox.setVisible(false);
+        updateGui();
+        if (game.getCurrentPlayer().isAi()) {
+            setDelayedNextPlayerExceptGameIsFinished();
+        }
     }
 
     private void buttonPassAction() {
@@ -111,13 +111,13 @@ public class Controller {
                         Player currentPlayer = game.getCurrentPlayer();
                         if (currentPlayer.isAi()) {
                             setDelayedNextPlayerExceptGameIsFinished();
-                        } else if(!game.hasPlayerPlayableCards()) {
+                        } else if (!game.hasPlayerPlayableCards()) {
                             setDelayedNextPlayerExceptGameIsFinished();
                         } else
                             btPass.setDisable(false);
-                            System.out.println("Next player not ai");
-                        }
-                    ));
+                        System.out.println("Next player not ai");
+                    }
+            ));
             timeline.play();
         } else {
             System.out.println("Game is finished");
@@ -142,7 +142,7 @@ public class Controller {
     private void updateWishedColorUi() {
         Card.COLOR wishedColor = game.getWishedColor();
         if (wishedColor == null) {
-            lbWishedColor.setText(game.getPlayedRounds()+"");
+            lbWishedColor.setText(game.getPlayedRounds() + "");
         } else {
             Color labelColor = getColorFromCardColor(wishedColor);
             lbWishedColor.setText(Card.colorToAsciiSymbol(wishedColor));
@@ -185,7 +185,6 @@ public class Controller {
             if (!player.isPlayerFinished()) {
                 for (int i = 0; i < handCards.size(); i++) {
                     Card card = handCards.get(i);
-                    boolean validMove = true;
                     if (plId == currentPlayerId) {
                         String colorString = "#9281ED";
                         hBPlayer.setBackground(
@@ -195,19 +194,17 @@ public class Controller {
                                                 CornerRadii.EMPTY,
                                                 Insets.EMPTY)
                                 ));
-                        validMove = game.isValidMove(card);
                     }
+                    boolean validMove = game.isValidMove(card);
 
-                    boolean leadingColon = !player.isAi();
-                    if(leadingColon){
-                        if(currentPlayerId != plId){
-                            validMove = false;
-                        }
-                        Button cardButton = createColoredButton(card, i, validMove);
-                        hBPlayer.getChildren().add(cardButton);
+                    boolean isHuman = !player.isAi();
+                    boolean humanTurn = isHuman && currentPlayerId == 0;
+                    if (isHuman) {
+                        ImageView cardView = createCard(card, i, validMove, humanTurn);
+                        hBPlayer.getChildren().add(cardView);
                     } else {
-                        Text cardText = createColoredText(card, validMove);
-                        hBPlayer.getChildren().add(cardText);
+                        ImageView cardView = createAiCard();
+                        hBPlayer.getChildren().add(cardView);
                     }
                     hBPlayer.setSpacing(20);
                 }
@@ -222,9 +219,63 @@ public class Controller {
 
     private void updateStapelCard() {
         Card stapelCard = game.getTopStapelCard();
-        Color stapelColor = getColorFromCardColor(stapelCard.getColor());
-        lbStapel.setTextFill(stapelColor);
-        lbStapel.setText(stapelCard.toPrettyString());
+        GuiCard guiCard = new GuiCard(stapelCard);
+        guiCard.setSelectable(false);
+        guiCard.setGreyedOut(false);
+        ImageView imageView = guiCard.getImageView(false);
+        System.out.println(imageView);
+        hbStapel.getChildren().clear();
+        hbStapel.getChildren().add(imageView);
+    }
+
+    private ImageView createVisibleAiCard(Card card, boolean validMove, boolean humanTurn) {
+        return createCard(card, -1, validMove, false);
+    }
+
+    private ImageView createAiCard(){
+        return new GuiCard().getImageView(true);
+    }
+
+    /**
+     * @param card
+     * @param id        Id of card in player hand
+     * @param validMove Can this card be played on current deck?
+     * @param humanTurn If card is created for human and human it's human turn
+     * @return
+     */
+    private ImageView createCard(Card card, int id, boolean validMove, boolean humanTurn) {
+        GuiCard guiCard = new GuiCard(card);
+        ImageView imageView = guiCard.getImageView(true);
+        //TODO: When all is hidden remove
+        boolean isHuman = id != -1;
+        if(isHuman){
+            if(humanTurn) {
+                if (validMove) {
+                    guiCard.setGreyedOut(false);
+                    guiCard.setSelectable(true);
+                } else {
+                    guiCard.setGreyedOut(true);
+                    guiCard.setSelectable(false);
+                }
+            } else {
+                guiCard.setGreyedOut(false);
+                guiCard.setSelectable(false);
+            }
+        } else {
+            if(validMove){
+                guiCard.setGreyedOut(false);
+                guiCard.setSelectable(false);
+            } else {
+                guiCard.setGreyedOut(true);
+                guiCard.setSelectable(false);
+            }
+        }
+        imageView.setOnMouseClicked(ae -> {
+            if (guiCard.isSelectable()) {
+                setNextPlayerButtonAction(id);
+            }
+        });
+        return imageView;
     }
 
     private Button createColoredButton(Card card, int i, boolean validMove) {
@@ -233,12 +284,12 @@ public class Controller {
         if (validMove) {
             Color cardColor = getColorFromCardColor(card.getColor());
             String hexString = Util.getHexRepresentation(cardColor);
-            cardButton.setStyle("-fx-text-fill: "+hexString);
+            cardButton.setStyle("-fx-text-fill: " + hexString);
             cardButton.setDisable(false);
         } else {
             Color gray = Color.GRAY;
             String hexString = Util.getHexRepresentation(gray);
-            cardButton.setStyle("-fx-text-fill: "+hexString);
+            cardButton.setStyle("-fx-text-fill: " + hexString);
             cardButton.setDisable(true);
         }
         cardButton.setFont(new Font(20.0));
@@ -264,8 +315,8 @@ public class Controller {
     /**
      * Plays selected card
      *
-     * @return true if played card is jack, false otherwise
      * @param cardId
+     * @return true if played card is jack, false otherwise
      */
     public boolean submitAction(int cardId) {
         Player currentPlayer = game.getCurrentPlayer();

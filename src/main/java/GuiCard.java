@@ -6,51 +6,72 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import lombok.Data;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
-@Data
 public class GuiCard {
 
     private Card card;
     private Image image;
     private Light.Distant light;
-    private boolean selectable = true;
+    private boolean selectable;
+    private Lighting lighting;
+    private ImageView imageView;
+    private boolean greyedOut = false;
 
-    GuiCard (){}
+    GuiCard() {
+    }
 
-    GuiCard (Card card){
+    GuiCard(Card card) {
         this.card = card;
     }
 
-    public ImageView getImageView(){
-        if(image == null) {
-            String prefix = card.getColor().toString().substring(0, 1).toLowerCase();
-            String valueFormatted = String.format("%02d", card.getValue());
-            String filename = prefix + valueFormatted + ".png";
+    public ImageView getImageView(boolean enableUserInteraction) {
+        if (image == null) {
+            String filename;
+            if (card == null) {
+                filename = "back.png";
+            } else {
+                String prefix = card.getColor().toString().substring(0, 1).toLowerCase();
+                String valueFormatted = String.format("%02d", card.getValue());
+                filename = prefix + valueFormatted + ".png";
+            }
             String path = Config.CARDS_FOLDER + "/" + Config.CLASSIC_THEME + "/" + Config.IMAGE_SIZE_FOLDER + "/";
             String fullFilename = path + filename;
             FileInputStream fileInputStream = Util.getFileInputStreamFromResources(getClass(), fullFilename);
             image = new Image(fileInputStream);
         }
-        ImageView imageView = new ImageView(image);
-        applyEffects(imageView);
-        addActions(imageView);
-//        imageView.setOnMouseEntered(image);
+        imageView = new ImageView(image);
+        prepareEffects();
+        if (enableUserInteraction) {
+            addMouseOverEffectToImageView();
+        }
         return imageView;
     }
 
-    public void setSelectable(boolean selectable){
-        if(!selectable){
+    public void setGreyedOut(boolean greyedOut) {
+        this.greyedOut = greyedOut;
+        if (this.greyedOut) {
+            greyedOutEffect();
+//            removeMouseOverActionFromImageView();
+        } else {
+            removeGreyedOutEffect();
+        }
+    }
+
+    public boolean isSelectable() {
+        return selectable;
+    }
+
+    public void setSelectable(boolean selectable) {
+        if (!selectable && image != null) {
             disselectedEffect();
         }
         this.selectable = selectable;
     }
 
-    private void addActions(ImageView imageView){
+    private void addMouseOverEffectToImageView() {
         imageView.setOnMouseEntered(ae -> {
-            if(selectable) {
+            if (selectable && !greyedOut) {
                 selectEffect();
             }
         });
@@ -59,29 +80,48 @@ public class GuiCard {
         });
     }
 
+    private void removeMouseOverActionFromImageView() {
+        imageView.setOnMouseEntered(null);
+        imageView.setOnMouseExited(null);
+    }
+
+    private void greyedOutEffect() {
+        imageView.setEffect(lighting);
+        light.setColor(Color.GRAY);
+    }
+
+    private void removeGreyedOutEffect() {
+        if (imageView != null) {
+            imageView.setEffect(null);
+        }
+    }
+
     private void selectEffect() {
-        light.setColor(Color.web("#b4f6ff"));
+        imageView.setEffect(lighting);
+        light.setColor(Color.LIGHTBLUE);
     }
 
     private void disselectedEffect() {
-        light.setColor(Color.WHITE);
+        if (greyedOut) {
+            greyedOutEffect();
+        } else {
+            imageView.setEffect(null);
+        }
     }
 
-    private void applyEffects(ImageView imageView){
+    //TODO: Can be static
+    private void prepareEffects() {
         light = new Light.Distant();
         light.setAzimuth(45.0);
         light.setElevation(30.0);
 
-        Lighting lighting = new Lighting();
+        lighting = new Lighting();
         lighting.setDiffuseConstant(1.3);
         lighting.setSpecularConstant(0.8);
         lighting.setSpecularExponent(16.5);
         lighting.setSurfaceScale(0.0);
         lighting.setLight(light);
-
-        imageView.setEffect(lighting);
     }
-
 
 
 }
